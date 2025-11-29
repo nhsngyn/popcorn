@@ -1,95 +1,121 @@
 import { useRef, useEffect, useState } from "react";
+import needleCursorImg from "../../assets/scratch/needle.png";
+import brushTexture from "../../assets/scratch/brushtexture.png"; 
 
+// onScratch prop 제거
 const ScratchCanvas = ({ width, height, coverImage, onReveal }) => {
   const canvasRef = useRef(null);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [isReady, setIsReady] = useState(false); // 준비 완료 상태 추가
+  const isDrawing = useRef(false);
+  const [isReady, setIsReady] = useState(false);
+  const brushImgRef = useRef(null); 
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
-    // 1. [중요] 일단 '지우기 모드'를 끕니다. (그리기 모드로 초기화)
-    ctx.globalCompositeOperation = "source-over";
+    const brush = new Image();
+    brush.src = brushTexture;
+    brush.onload = () => { brushImgRef.current = brush; };
 
-    // 2. 안전장치: 이미지가 안 떠도 긁는 맛은 나게 '회색'으로 먼저 덮습니다.
-    ctx.fillStyle = "#999999"; 
+    ctx.clearRect(0, 0, width, height); 
+    ctx.globalCompositeOperation = "source-over"; 
+    ctx.fillStyle = "#222"; 
     ctx.fillRect(0, 0, width, height);
 
-    // 3. 이미지 로딩 시작
     const img = new Image();
-    img.crossOrigin = "Anonymous"; 
-    img.src = coverImage;
+    img.crossOrigin = "Anonymous";
     
     img.onload = () => {
-      // 4. 이미지가 로딩되면 회색 위에 덮어 그립니다.
-      ctx.globalCompositeOperation = "source-over"; // 확실하게 그리기 모드
-      ctx.drawImage(img, 0, 0, width, height);
+      const canvasRatio = width / height;
+      const imgRatio = img.width / img.height;
+      let renderWidth, renderHeight, offsetX, offsetY;
 
-      // 5. [핵심] 그림을 다 그린 '다음에' 지우개 모드로 변경합니다.
-      ctx.globalCompositeOperation = "destination-out"; 
-      ctx.lineWidth = 60;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
+      if (canvasRatio > imgRatio) {
+        renderWidth = width;
+        renderHeight = width / imgRatio;
+        offsetX = 0;
+        offsetY = (height - renderHeight) / 2;
+      } else {
+        renderWidth = height * imgRatio;
+        renderHeight = height;
+        offsetX = (width - renderWidth) / 2;
+        offsetY = 0;
+      }
       
-      setIsReady(true); // 이제 긁어도 된다고 신호 줌
+      ctx.globalCompositeOperation = "source-over"; 
+      ctx.drawImage(img, offsetX, offsetY, renderWidth, renderHeight);
+      
+      ctx.globalCompositeOperation = "destination-out"; 
+      setIsReady(true);
     };
 
-    // (혹시 이미지가 깨져도 기본 기능은 하게 설정)
-    ctx.globalCompositeOperation = "destination-out"; 
-    ctx.lineWidth = 60;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
+    img.src = coverImage; 
 
   }, [coverImage, width, height]);
 
-  // 70% 체크 로직
   const checkRevealPercentage = () => {
-    if (!isReady) return; // 준비 안 됐으면 계산 금지
-
+    if (!isReady) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    const imageData = ctx.getImageData(0, 0, width, height);
-    const pixels = imageData.data;
-    let transparentPixels = 0;
-
-    // 픽셀 검사 (성능을 위해 16픽셀씩 건너뛰며 대충 검사)
-    for (let i = 3; i < pixels.length; i += 16) {
-      if (pixels[i] === 0) transparentPixels++;
-    }
-
-    // 전체 픽셀 대비 투명 픽셀 비율 (건너뛴 만큼 보정 불필요, 비율은 같음)
-    const totalTested = pixels.length / 16; 
-    const currentPercent = (transparentPixels / totalTested) * 100;
-
-    if (currentPercent > 70) {
-      onReveal(); 
-    }
+    try {
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const pixels = imageData.data;
+        let transparentPixels = 0;
+        for (let i = 3; i < pixels.length; i += 64) { 
+            if (pixels[i] === 0) transparentPixels++;
+        }
+        const totalTested = pixels.length / 64;
+        const currentPercent = (transparentPixels / totalTested) * 100;
+        if (currentPercent > 50) {
+            onReveal();
+        }
+    } catch (e) {}
   };
 
   const startDrawing = (e) => {
-    setIsDrawing(true);
+    isDrawing.current = true;
     draw(e);
   };
 
   const stopDrawing = () => {
-    setIsDrawing(false);
-    checkRevealPercentage(); 
+    isDrawing.current = false;
+    checkRevealPercentage();
   };
 
   const draw = (e) => {
-    if (!isDrawing) return;
-    
+    if (!isDrawing.current || !isReady) return;
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
 
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
+    if (brushImgRef.current) {
+        // 브러시 크기 조금 키워서 시원하게 찢기도록 함
+        const brushSize = 70; 
+        
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(Math.random() * Math.PI * 2); 
+        ctx.drawImage(
+            brushImgRef.current, 
+            -brushSize / 2, 
+            -brushSize / 2, 
+            brushSize, 
+            brushSize
+        );
+        ctx.restore();
+    } else {
+        ctx.beginPath();
+        ctx.arc(x, y, 50, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    
+    // 조각 생성 로직 삭제됨
   };
 
   return (
@@ -101,8 +127,11 @@ const ScratchCanvas = ({ width, height, coverImage, onReveal }) => {
       onMouseUp={stopDrawing}
       onMouseMove={draw}
       onMouseLeave={stopDrawing}
-      // 👇 [수정] cursor-none을 지웠습니다! 이제 기본 마우스가 보일 겁니다.
-      className="absolute inset-0 z-20 touch-none cursor-crosshair" 
+      onTouchStart={startDrawing}
+      onTouchEnd={stopDrawing}
+      onTouchMove={draw}
+      style={{ cursor: `url(${needleCursorImg}) 0 32, auto` }} 
+      className="absolute inset-0 z-20 touch-none"
     />
   );
 };
