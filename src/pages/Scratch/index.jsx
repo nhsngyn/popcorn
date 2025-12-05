@@ -18,10 +18,10 @@ const Scratch = () => {
   });
 
   useEffect(() => {
-    // 1.5초 뒤 줌인 시작
+    // 1초 뒤 줌인 시작
     const timer = setTimeout(() => {
       setIsZoomed(true);
-    }, 1500);
+    }, 1000);
 
     const handleResize = () => {
       setWindowSize({ width: window.innerWidth, height: window.innerHeight });
@@ -40,25 +40,35 @@ const Scratch = () => {
       <div className="absolute inset-0 z-50 pointer-events-none" 
            style={{ background: "radial-gradient(circle, transparent 30%, black 100%)" }} />
 
-      {/* =================================================================
+{/* =================================================================
           LAYER 0: 진짜 세상 (터널)
       ================================================================= */}
-      <div className="absolute inset-0 z-0">
+      <motion.div 
+        className="absolute inset-0 z-0"
+        initial={{ opacity: 0 }}   
+        animate={{ opacity: 1 }}   
+        transition={{ duration: 0.5, delay: 2.5 }} 
+      >
         <img src={tunnelImg} alt="Real Tunnel" className="w-full h-full object-cover opacity-80" />
-        {/* 성공 메시지 */}
+        
+        {/* 성공 메시지 (문구 변경됨!) */}
         {isRevealed && (
           <motion.div 
-            initial={{ opacity: 0, scale: 0.8 }} 
+            initial={{ opacity: 0, scale: 0.9 }} 
             animate={{ opacity: 1, scale: 1 }} 
-            transition={{ duration: 1, delay: 0.5 }}
-            className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 z-50"
+            transition={{ duration: 1.3, delay: 0.2 }} // 천천히 웅장하게 뜨도록 변경
+            className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 z-50 text-center p-4"
           >
-            <h1 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-t from-blue-500 to-purple-200 drop-shadow-[0_0_30px_rgba(255,255,255,0.8)] tracking-widest">
-              ESCAPE
-            </h1>
+<h1 
+  style={{ fontFamily: "'Spooky', serif" }} 
+  className="text-6xl font-black text-white z-50"
+>
+  WHAT YOU<br/>WISH FOR
+</h1>
+            
           </motion.div>
         )}
-      </div>
+      </motion.div>
 
       {/* =================================================================
           LAYER 1: 초기 배경 (사탕 테이블) - 줌인 시 부드럽게 사라짐
@@ -95,14 +105,13 @@ const Scratch = () => {
         className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none overflow-hidden"
         
         // 1. 초기 위치: 오른쪽 아래, 약간 기울어짐 (자연스럽게)
-        initial={{ x: "30%", y: "40%", scale: 0.7, rotate: 5 }}
+        initial={{ x: "30%", y: "10%", scale: 0.8, rotate: 15 }}
 
         // 2. 줌인 후: 중앙 정렬, 적당한 확대, 회전 0 (정자세)
         animate={isZoomed ? { 
-          x: 0, 
+          x: 400, 
           y: 0, 
-          scale: 6.5, // 👈 [조절 포인트] 이 숫자가 중요합니다! (구멍이 화면에 꽉 차는 정도)
-                      // 너무 크면 손이 안 보이고, 너무 작으면 구멍이 작습니다. 6~8 사이 추천.
+          scale: 7.5,
           rotate: 0 
         } : { 
           x: "30%", y: "40%", scale: 0.7, rotate: 5 
@@ -111,7 +120,7 @@ const Scratch = () => {
         transition={{ 
           duration: 2.5, 
           // 👇 [핵심] 베지어 곡선: 천천히 출발 -> 빠르게 이동 -> 부드럽게 감속 (S자 곡선)
-          ease: [0.22, 1, 0.36, 1] 
+          ease: [0.7, 0, 0.3, 1]
         }}
       >
          <img 

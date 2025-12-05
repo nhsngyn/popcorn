@@ -1,3 +1,13 @@
+/* src/styles/index.css */
+@font-face {
+  font-family: 'Spooky'; /* 이름을 아예 새로 지음 */
+  src: url('/fonts/Coraline.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block; /* 폰트 로딩될 때까지 텍스트 숨김 (깜빡임 방지) */
+}
+
+/* 기존 Tailwind 설정들 */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

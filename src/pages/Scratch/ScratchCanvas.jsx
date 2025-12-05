@@ -66,7 +66,7 @@ const ScratchCanvas = ({ width, height, coverImage, onReveal }) => {
         }
         const totalTested = pixels.length / 64;
         const currentPercent = (transparentPixels / totalTested) * 100;
-        if (currentPercent > 50) {
+        if (currentPercent > 30) {
             onReveal();
         }
     } catch (e) {}
@@ -95,8 +95,7 @@ const ScratchCanvas = ({ width, height, coverImage, onReveal }) => {
     const y = clientY - rect.top;
 
     if (brushImgRef.current) {
-        // 브러시 크기 조금 키워서 시원하게 찢기도록 함
-        const brushSize = 70; 
+        const brushSize = 80; 
         
         ctx.save();
         ctx.translate(x, y);
