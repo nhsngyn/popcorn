@@ -113,7 +113,6 @@ const ScratchCanvas = ({ width, height, coverImage, onReveal }) => {
         ctx.arc(x, y, 50, 0, Math.PI * 2);
         ctx.fill();
     }
-    
     // 조각 생성 로직 삭제됨
   };
 
