@@ -1,16 +1,144 @@
-# React + Vite
+# 🎬 Web Interaction Cinema
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**영화적 미장센을 웹 인터랙션으로 재해석한 실험적 웹 전시**
 
-Currently, two official plugins are available:
+본 프로젝트는 영화적 미장센을 웹 인터랙션 기술로 재해석한 'Web Interaction Cinema'입니다.  
+홍콩 누아르의 시각적 긴장감, 다크 판타지의 촉각적 몰입, 레트로 팝아트의 리듬감을  
+**React와 GSAP 기반 2D 모션 인터랙션**으로 구현했습니다.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+3D 라이브러리에 의존하지 않고, **최적화된 2D 렌더링만으로 깊은 몰입감**을 주는 것을 기술적 목표로 삼았습니다.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🎯 프로젝트 목적
 
-## Expanding the ESLint configuration
+3개의 서로 다른 영화적 분위기를  
+**React + GSAP 기반의 고도화된 2D 인터랙션**으로 재해석해  
+사용자에게 짧고 강렬한 체험형 웹 인터랙션을 제공합니다.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🎭 3개의 인터랙션
+
+### 1. 🎡 룰렛 인터랙션 – 홍콩 누아르
+- **분위기**: 네온으로 젖은 술집 테이블의 긴장감
+- **기술**: GSAP easing (power4.out) + blur 효과로 속도감 구현
+- **연출**: 피자 조각 모양 커버 아래 돌아가는 룰렛, 흐릿한 네온사인 배경
+- **컬러**: 붉은/푸른 네온 반사광
+
+### 2. 🧵 스크래치 인터랙션 – 코렐라인 다크 판타지
+- **분위기**: 1인칭 시점에서 '구멍 너머 세계'를 바라보는 긴장감
+- **기술**: Canvas API destination-out 스크래치 + 패럴랙스 효과
+- **연출**: 찢을수록 어둡고 기묘한 세계가 드러남 (70% 달성 시 완전 오픈)
+- **컬러**: 보랏빛/푸른빛의 심도 있는 음영
+
+### 3. 🍩 도넛 쌓기 – 레트로 다이너 팝아트
+- **분위기**: 80's 레트로 다이너의 경쾌한 리듬감
+- **기술**: GSAP squash/stretch + 그림자 확대 애니메이션
+- **연출**: 좌우로 움직이는 도넛을 클릭해 쌓기 (5개 성공 시 "PERFECT!")
+- **컬러**: 핫핑크, 민트그린, 레드 팝아트 스타일
+
+---
+
+## ⚙️ 기술 스택
+
+- **React 19** – 페이지 구조 및 상태 관리
+- **GSAP 3.13** – 모션 중심 인터랙션
+- **Framer Motion** – 선언적 애니메이션
+- **Canvas API** – 스크래치 구현
+- **React Router** – 페이지 라우팅
+- **Tailwind CSS** – 스타일링
+- **Vite** – 빌드 툴
+
+---
+
+## 🎨 비주얼 & 아트 디렉션
+
+### 룰렛 – 홍콩 누아르
+- 붉은/푸른 네온 반사광
+- 술집 테이블의 질감
+- 촉촉한 도시 밤 분위기
+
+### 스크래치 – 다크 판타지
+- 코렐라인의 노이즈 텍스처
+- 공포 + 동화적 컬러 믹스
+- 보랏빛/푸른빛의 심도 있는 음영
+
+### 도넛 쌓기 – 레트로 다이너
+- 핫핑크, 민트그린, 레드
+- 네온 라이트 + 체크보드 바닥
+- 잡지 광고 같은 팝아트 스타일
+
+---
+
+## 🚀 시작하기
+
+### 설치
+```bash
+npm install
+```
+
+### 개발 서버 실행
+```bash
+npm run dev
+```
+
+### 빌드
+```bash
+npm run build
+```
+
+### 프리뷰
+```bash
+npm run preview
+```
+
+---
+
+## 📂 프로젝트 구조
+
+```
+popcorn/
+├── src/
+│   ├── pages/
+│   │   ├── Lobby/          # 메인 로비 (3개 인터랙션 선택)
+│   │   ├── Roulette/       # 룰렛 인터랙션
+│   │   ├── Scratch/        # 스크래치 인터랙션
+│   │   └── Donut/          # 도넛 쌓기 인터랙션
+│   ├── components/         # 공통 컴포넌트
+│   ├── assets/             # 이미지 에셋
+│   └── styles/             # 글로벌 스타일
+└── public/
+    └── fonts/              # 커스텀 폰트
+```
+
+---
+
+## 🧪 기술적 목표
+
+- ✅ Three.js 등 3D 라이브러리 사용 없이 **2D 애니메이션만으로 깊은 몰입감** 구현
+- ✅ 모든 인터랙션을 **60fps**에 가깝게 부드럽게 유지
+- ✅ 성능 최적화를 고려한 **Lazy Loading + Code Splitting**
+- ✅ 모바일에서도 무리 없이 동작하는 반응형 설계
+
+---
+
+## 🎬 핵심 기획 의도
+
+> "웹에서 구현할 수 있는 **미장센 기반의 영화적 몰입감** 실험"
+
+3D를 쓰지 않고, **2D 이미지 + 애니메이션만으로 깊이감을 극대화**하여  
+사용자가 **'짧은 영화관 3편을 본 것 같은 경험'**을 하게 만드는 것이 목표입니다.
+
+---
+
+## 📝 라이선스
+
+MIT
+
+---
+
+## 👤 작성자
+
+**Web Interaction Cinema Project**  
+2025
