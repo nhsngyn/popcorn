@@ -28,15 +28,15 @@ const Scratch = () => {
     const isMobile = window.innerWidth < 768;
     setUseVideo(!isMobile);
 
-    // 1초 뒤 줌인 시작
+    // 3초 뒤 줌인 시작 (1초 → 3초로 변경, 강아지 더 오래 보기)
     const zoomTimer = setTimeout(() => {
       setIsZoomed(true);
-    }, 1000);
+    }, 3000);
 
-    // 3.5초 뒤 스크래치 활성화
+    // 5.5초 뒤 스크래치 활성화 (3.5초 → 5.5초, 줌인 시간 증가에 맞춤)
     const scratchTimer = setTimeout(() => {
       setCanScratch(true);
-    }, 3500);
+    }, 5500);
 
     const handleResize = () => {
       setWindowSize({ width: window.innerWidth, height: window.innerHeight });
@@ -267,6 +267,14 @@ const Scratch = () => {
             className="w-full h-full object-cover" 
           />
         )}
+        
+        {/* 워터마크 가리기 - 우측 상단 어둡게 */}
+        <div 
+          className="absolute top-0 right-0 w-1/3 h-1/4 pointer-events-none z-10"
+          style={{
+            background: 'radial-gradient(circle at top right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 40%, transparent 70%)'
+          }}
+        />
       </motion.div>
 
       {/* =================================================================
