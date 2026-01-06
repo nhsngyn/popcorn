@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 // 페이지들 불러오기
 import Lobby from './pages/Lobby';
-import Roulette from './pages/Roulette';
+import MahjongCinema from './pages/Roulette/MahjongCinema';
 import Scratch from './pages/Scratch';
 import Donut from './pages/Donut';
 
@@ -12,7 +12,7 @@ function App() {
       <Route path="/" element={<Lobby />} />
       
       {/* 룰렛 페이지 (주소: /roulette) */}
-      <Route path="/roulette" element={<Roulette />} />
+      <Route path="/roulette" element={<MahjongCinema />} />
       
       {/* 스크래치 페이지 (주소: /scratch) */}
       <Route path="/scratch" element={<Scratch />} />
