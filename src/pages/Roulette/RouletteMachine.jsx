@@ -93,9 +93,9 @@ const RouletteMachine = () => {
 
       {/* 4. [CONTROL] 스핀 버튼 (중앙) */}
       <button
-        onClick={handleSpin}
+        onPointerDown={handleSpin}
         disabled={isSpinning}
-        className="absolute z-30 w-32 h-32 bg-gradient-to-br from-red-900 to-black rounded-full border-6 border-[#5c3a3a] shadow-[0_0_40px_rgba(255,0,0,0.5)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-[0_0_60px_rgba(255,0,0,0.8)]"
+        className="absolute z-30 w-32 h-32 bg-gradient-to-br from-red-900 to-black rounded-full border-6 border-[#5c3a3a] shadow-[0_0_40px_rgba(255,0,0,0.5)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-[0_0_60px_rgba(255,0,0,0.8)] touch-none"
       >
         <span className={`text-white font-bold text-2xl ${isSpinning ? 'opacity-50' : 'animate-pulse'}`}>
           {isSpinning ? "..." : "SPIN"}

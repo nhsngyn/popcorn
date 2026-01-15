@@ -298,10 +298,10 @@ const MahjongCinema = () => {
             .map((_, index) => (
               <div
                 key={index}
-                onClick={() => handleFlipCard(index)}
+                onPointerDown={() => handleFlipCard(index)}
                 className={`relative w-[160px] h-[224px] ${
                   canInteract ? "cursor-pointer" : "cursor-default"
-                } transition-all duration-200`}
+                } transition-all duration-200 touch-none`}
                 style={{
                   perspective: "1200px",
                 }}
@@ -366,8 +366,8 @@ const MahjongCinema = () => {
       {!videoEnded && (
         <div className="absolute bottom-12 left-12 z-50">
           <motion.button
-            onClick={handleSkipVideo}
-            className="group relative"
+            onPointerDown={handleSkipVideo}
+            className="group relative touch-none"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             initial={{ opacity: 0, x: -20 }}
@@ -390,9 +390,9 @@ const MahjongCinema = () => {
         {/* SHUFFLE 버튼 (카드 인터랙션 활성화 후) */}
         {canInteract && (
           <motion.button
-            onClick={shuffleCards}
+            onPointerDown={shuffleCards}
             disabled={isShuffling}
-            className="group relative"
+            className="group relative touch-none"
             whileHover={{ scale: isShuffling ? 1 : 1.05 }}
             whileTap={{ scale: isShuffling ? 1 : 0.95 }}
             initial={{ opacity: 0, x: 20 }}
