@@ -1,399 +1,147 @@
 // src/pages/Donut/DonutGame.jsx
 import { useState, useEffect, useRef } from "react";
-import { motion, useAnimation } from "framer-motion";
-import gsap from "gsap";
+import { motion, AnimatePresence } from "framer-motion";
 
-// 도넛 이미지들 (에셋 준비 후 import)
-// import donut1 from "../../assets/donut/donut-1.png";
-// import donut2 from "../../assets/donut/donut-2.png";
-// import donut3 from "../../assets/donut/donut-3.png";
-// import donut4 from "../../assets/donut/donut-4.png";
-// import donut5 from "../../assets/donut/donut-5.png";
+const DONUT_COLORS = ["#ff9ff3", "#feca57", "#ff6b6b", "#48dbfb", "#1dd1a1"];
 
 const DonutGame = ({ onScoreUpdate, onGameClear }) => {
-  const [currentDonut, setCurrentDonut] = useState(0);
-  const [nextDonut, setNextDonut] = useState(1);
-  const [stackedDonuts, setStackedDonuts] = useState([]);
-  const [isDropping, setIsDropping] = useState(false);
-  const [gameOver, setGameOver] = useState(false);
-  const [particles, setParticles] = useState([]); // 파티클 효과
-  const [showConfetti, setShowConfetti] = useState(false); // 성공 시 confetti
-  
-  const donutRef = useRef(null);
-  const tableRef = useRef(null);
-  const shadowRef = useRef(null);
-  const controls = useAnimation();
+  const [stack, setStack] = useState([]); 
+  // 화면 렌더링용 state
+  const [renderX, setRenderX] = useState(0); 
+  const [gameStatus, setGameStatus] = useState("playing"); 
 
-  // 도넛 종류 (임시 이모지, 실제로는 이미지로 교체)
-  const donutTypes = ["🍩", "🍪", "🧁", "🎂", "🍰"];
-  
-  // 도넛 색상 매핑 (실제 이미지 사용 시 제거 가능)
-  const donutColors = [
-    "bg-pink-400",
-    "bg-amber-600", 
-    "bg-purple-400",
-    "bg-red-400",
-    "bg-yellow-400"
-  ];
+  // ★ 핵심: 애니메이션 연산용 Ref (리렌더링 없이 즉시 값 변경)
+  // State 대신 이걸 써야 애니메이션이 끊기지 않습니다.
+  const xRef = useRef(0);
+  const directionRef = useRef(1); // 1: 오른쪽, -1: 왼쪽
+  const speedRef = useRef(3);
+  const animationRef = useRef();
+  const isPlayingRef = useRef(true); // 게임 진행 여부도 Ref로 관리
 
-  // 좌우 이동 애니메이션 (회전 추가)
+  // 1. 게임 루프 (물리 엔진)
+  const gameLoop = () => {
+    if (!isPlayingRef.current) return;
+
+    // A. 위치 이동
+    xRef.current += speedRef.current * directionRef.current;
+
+    // B. 벽 충돌 감지 (좌우 150px)
+    if (xRef.current > 150) {
+      xRef.current = 150;
+      directionRef.current = -1; // 방향 전환
+    } else if (xRef.current < -150) {
+      xRef.current = -150;
+      directionRef.current = 1;
+    }
+
+    // C. 화면 업데이트 (React에게 그리기 요청)
+    setRenderX(xRef.current);
+
+    // D. 다음 프레임 예약
+    animationRef.current = requestAnimationFrame(gameLoop);
+  };
+
   useEffect(() => {
-    if (!isDropping && !gameOver) {
-      controls.start({
-        x: [0, 200, 0, -200, 0],
-        rotate: [0, 180, 360, 540, 720], // 좌우 이동하며 회전
-        transition: {
-          duration: 4,
-          repeat: Infinity,
-          ease: "linear"
-        }
-      });
+    // 게임 시작 시 루프 실행
+    if (gameStatus === "playing") {
+      isPlayingRef.current = true;
+      animationRef.current = requestAnimationFrame(gameLoop);
     }
-  }, [isDropping, gameOver, controls]);
+    // 청소 (컴포넌트 사라질 때)
+    return () => cancelAnimationFrame(animationRef.current);
+  }, [gameStatus]);
 
-  // 파티클 생성 함수
-  const createParticles = (x, y) => {
-    const newParticles = [];
-    for (let i = 0; i < 8; i++) {
-      newParticles.push({
-        id: Date.now() + i,
-        x: x,
-        y: y,
-        angle: (Math.PI * 2 * i) / 8,
-        speed: 50 + Math.random() * 50,
-        color: ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3'][Math.floor(Math.random() * 4)]
-      });
-    }
-    setParticles(newParticles);
-    setTimeout(() => setParticles([]), 1000);
-  };
-
-  // 도넛 떨어뜨리기 (개선된 버전)
+  // 2. 도넛 떨어뜨리기 (클릭 핸들러)
   const handleDrop = () => {
-    if (isDropping || gameOver) return;
-    
-    setIsDropping(true);
-    controls.stop();
+    if (gameStatus !== "playing") return;
 
-    // 현재 X 위치 가져오기
-    const currentX = donutRef.current?.offsetLeft || 0;
-    const targetY = 300 - (stackedDonuts.length * 60);
+    // 현재 위치 확정
+    const currentDropX = xRef.current;
     
-    // 그림자 애니메이션 (도넛이 떨어지는 동안)
-    if (shadowRef.current) {
-      gsap.to(shadowRef.current, {
-        scale: [0.5, 1.5],
-        opacity: [0.3, 0.8],
-        duration: 0.8,
-        ease: "power2.in"
-      });
+    // A. 스택 추가
+    const newDonut = { 
+      x: currentDropX, 
+      color: DONUT_COLORS[stack.length % DONUT_COLORS.length] 
+    };
+    const newStack = [...stack, newDonut];
+    setStack(newStack);
+    onScoreUpdate(newStack.length);
+
+    // B. 성공 체크 (5개 쌓으면 끝)
+    if (newStack.length >= 5) {
+      isPlayingRef.current = false; // 루프 정지
+      setGameStatus("success");
+      onGameClear();
+      cancelAnimationFrame(animationRef.current);
+    } else {
+      // 난이도 상승: 속도 빨라짐
+      speedRef.current += 1.0; 
+      // 위치 초기화 없이 계속 진행 (연속성)
     }
-    
-    // 낙하 애니메이션 (GSAP) - 회전 추가
-    gsap.to(donutRef.current, {
-      y: targetY,
-      rotation: "+=720", // 떨어지면서 2바퀴 회전
-      duration: 0.8,
-      ease: "power2.in",
-      onUpdate: function() {
-        // 떨어지는 속도에 따라 블러 효과
-        const progress = this.progress();
-        if (donutRef.current) {
-          donutRef.current.style.filter = `blur(${progress * 3}px)`;
-        }
-      },
-      onComplete: () => {
-        // 블러 제거
-        if (donutRef.current) {
-          donutRef.current.style.filter = 'blur(0px)';
-        }
-
-        // 충돌 감지
-        const isStacked = checkCollision(currentX);
-        
-        if (isStacked) {
-          // 착지 성공! 파티클 효과
-          createParticles(currentX, targetY);
-          
-          // 테이블 흔들림 효과
-          if (tableRef.current) {
-            gsap.timeline()
-              .to(tableRef.current, {
-                y: 5,
-                duration: 0.05,
-                ease: "power2.out"
-              })
-              .to(tableRef.current, {
-                y: 0,
-                duration: 0.3,
-                ease: "elastic.out(1, 0.5)"
-              });
-          }
-
-          // Squash & Stretch 효과 (더 과장되게)
-          const tl = gsap.timeline();
-          tl.to(donutRef.current, {
-            scaleY: 0.6,
-            scaleX: 1.4,
-            duration: 0.08
-          })
-          .to(donutRef.current, {
-            scaleY: 1.1,
-            scaleX: 0.9,
-            duration: 0.15,
-            ease: "power2.out"
-          })
-          .to(donutRef.current, {
-            scaleY: 1,
-            scaleX: 1,
-            duration: 0.25,
-            ease: "elastic.out(1, 0.3)"
-          });
-
-          // 성공: 스택에 추가
-          const newStack = [...stackedDonuts, {
-            type: currentDonut,
-            x: currentX
-          }];
-          setStackedDonuts(newStack);
-          onScoreUpdate(newStack.length);
-
-          // 5개 성공 시 클리어 + Confetti
-          if (newStack.length >= 5) {
-            setShowConfetti(true);
-            setTimeout(() => {
-              onGameClear();
-              setGameOver(true);
-            }, 500);
-          } else {
-            // 다음 도넛 준비
-            setTimeout(() => resetDonut(), 400);
-          }
-        } else {
-          // 실패: 도넛이 옆으로 떨어짐
-          gsap.to(donutRef.current, {
-            x: currentX > 0 ? 200 : -200,
-            y: 400,
-            rotation: "+=360",
-            opacity: 0,
-            duration: 0.6,
-            ease: "power2.in",
-            onComplete: () => {
-              setGameOver(true);
-            }
-          });
-        }
-      }
-    });
-  };
-
-  // 충돌 감지 (간단한 버전)
-  const checkCollision = (x) => {
-    if (stackedDonuts.length === 0) return true; // 첫 도넛은 무조건 성공
-    
-    const lastDonut = stackedDonuts[stackedDonuts.length - 1];
-    const tolerance = 50; // 허용 오차 (픽셀)
-    
-    return Math.abs(x - lastDonut.x) < tolerance;
-  };
-
-  // 도넛 리셋
-  const resetDonut = () => {
-    gsap.set(donutRef.current, { 
-      y: 0, 
-      scaleX: 1, 
-      scaleY: 1, 
-      rotation: 0,
-      opacity: 1,
-      filter: 'blur(0px)'
-    });
-    setCurrentDonut(nextDonut);
-    setNextDonut((nextDonut + 1) % donutTypes.length);
-    setIsDropping(false);
-  };
-
-  // 게임 재시작
-  const handleRestart = () => {
-    setStackedDonuts([]);
-    setCurrentDonut(0);
-    setNextDonut(1);
-    setGameOver(false);
-    setIsDropping(false);
-    onScoreUpdate(0);
-    gsap.set(donutRef.current, { y: 0, scaleX: 1, scaleY: 1 });
   };
 
   return (
-    <div ref={tableRef} className="relative w-full h-[400px]">
+    <div 
+      className="relative w-full h-[400px] flex flex-col justify-end items-center cursor-pointer touch-none" 
+      onPointerDown={handleDrop} // 모바일 터치 대응을 위해 onPointerDown 사용
+    >
       
-      {/* 파티클 효과 */}
-      {particles.map((particle) => (
-        <motion.div
-          key={particle.id}
-          className="absolute w-3 h-3 rounded-full pointer-events-none"
-          style={{
-            backgroundColor: particle.color,
-            left: particle.x,
-            top: particle.y,
-          }}
-          initial={{ scale: 1, opacity: 1 }}
-          animate={{
-            x: Math.cos(particle.angle) * particle.speed,
-            y: Math.sin(particle.angle) * particle.speed,
-            scale: 0,
-            opacity: 0,
-          }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        />
-      ))}
-
-      {/* Confetti (5개 성공 시) */}
-      {showConfetti && (
-        <>
-          {[...Array(30)].map((_, i) => (
-            <motion.div
-              key={`confetti-${i}`}
-              className="absolute w-2 h-4 pointer-events-none"
-              style={{
-                backgroundColor: ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#1dd1a1'][i % 5],
-                left: '50%',
-                top: '20%',
-                rotate: Math.random() * 360,
-              }}
-              initial={{ scale: 0, opacity: 1 }}
-              animate={{
-                x: (Math.random() - 0.5) * 400,
-                y: Math.random() * 300 + 100,
-                rotate: Math.random() * 720,
-                scale: 1,
-                opacity: 0,
-              }}
-              transition={{ 
-                duration: 1.5 + Math.random() * 0.5, 
-                ease: "easeOut",
-                delay: Math.random() * 0.3
-              }}
-            />
-          ))}
-        </>
-      )}
-      
-      {/* 쌓인 도넛들 (원근감 추가) */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col-reverse items-center">
-        {stackedDonuts.map((donut, index) => {
-          const scale = 1 + (index * 0.05); // 위로 갈수록 살짝 크게 (원근감)
-          return (
+      {/* 1. 쌓인 도넛들 */}
+      <div className="relative w-full h-full flex flex-col-reverse items-center mb-10">
+        <AnimatePresence>
+          {stack.map((donut, index) => (
             <motion.div
               key={index}
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ 
-                type: "spring", 
-                stiffness: 200, 
-                damping: 15,
-                delay: 0.1 
-              }}
-              className={`w-24 h-16 ${donutColors[donut.type]} rounded-full flex items-center justify-center text-4xl shadow-lg relative`}
-              style={{ 
-                transform: `scale(${scale})`,
-                filter: `drop-shadow(0 ${4 + index * 2}px ${8 + index * 2}px rgba(0,0,0,0.3))`
+              initial={{ y: -300, opacity: 0 }} 
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              className="absolute"
+              style={{
+                bottom: index * 35, 
+                left: `calc(50% + ${donut.x}px)`, 
+                zIndex: index,
               }}
             >
-              {donutTypes[donut.type]}
-              {/* 하이라이트 효과 */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent rounded-full pointer-events-none" />
+              <div 
+                className="w-32 h-12 rounded-[50%] border-4 border-black shadow-[0_5px_0_rgba(0,0,0,0.2)]"
+                style={{ backgroundColor: donut.color, transform: "translateX(-50%)" }}
+              >
+                <div className="absolute top-1 left-1/2 -translate-x-1/2 w-12 h-6 bg-black/10 rounded-[50%]" />
+                <div className="absolute top-0 right-4 w-2 h-2 bg-white rounded-full opacity-50" />
+              </div>
             </motion.div>
-          );
-        })}
+          ))}
+        </AnimatePresence>
       </div>
 
-      {/* 그림자 (동적) */}
-      {!gameOver && (
-        <div
-          ref={shadowRef}
-          className="absolute left-1/2 -translate-x-1/2 w-20 h-8 bg-black/30 rounded-full blur-md pointer-events-none"
+      {/* 2. 현재 움직이는 도넛 (성공하면 사라짐) */}
+      {gameStatus === "playing" && (
+        <div 
+          className="absolute top-10 will-change-transform" // 성능 최적화 힌트
           style={{ 
-            bottom: `${stackedDonuts.length * 60}px`,
-            willChange: "transform, opacity"
+            left: `calc(50% + ${renderX}px)`, // Ref 대신 State 사용 (화면 갱신용)
+            transform: "translateX(-50%)"
           }}
-        />
-      )}
-
-      {/* 현재 떨어뜨릴 도넛 (개선된 버전) */}
-      {!gameOver && (
-        <motion.div
-          ref={donutRef}
-          animate={controls}
-          onClick={handleDrop}
-          className={`absolute top-0 left-1/2 -translate-x-1/2 w-24 h-16 ${donutColors[currentDonut]} rounded-full flex items-center justify-center text-4xl cursor-pointer shadow-2xl relative overflow-hidden`}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          style={{ willChange: "transform" }}
         >
-          {donutTypes[currentDonut]}
-          {/* 하이라이트 */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent rounded-full pointer-events-none" />
-          {/* 클릭 힌트 */}
-          {!isDropping && (
-            <motion.div
-              className="absolute inset-0 border-4 border-white/50 rounded-full"
-              animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-          )}
-        </motion.div>
+           <div 
+              className="w-32 h-12 rounded-[50%] border-4 border-black shadow-xl"
+              style={{ backgroundColor: DONUT_COLORS[stack.length % DONUT_COLORS.length] }}
+            >
+              <div className="absolute top-1 left-1/2 -translate-x-1/2 w-12 h-6 bg-black/10 rounded-[50%]" />
+           </div>
+           <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-2xl animate-bounce">👇</div>
+        </div>
       )}
 
-      {/* 다음 도넛 미리보기 (개선) */}
-      {!gameOver && (
+      {/* 3. 성공 메시지 */}
+      {gameStatus === "success" && (
         <motion.div 
-          className="absolute top-4 right-4 bg-white/90 p-3 rounded-xl shadow-lg backdrop-blur-sm"
-          initial={{ x: 100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          initial={{ scale: 0 }} animate={{ scale: 1 }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none"
         >
-          <p className="text-xs text-gray-500 font-bold mb-1 tracking-wider">NEXT</p>
-          <div className={`w-12 h-8 ${donutColors[nextDonut]} rounded-full flex items-center justify-center text-2xl relative overflow-hidden`}>
-            {donutTypes[nextDonut]}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-full" />
-          </div>
-        </motion.div>
-      )}
-
-      {/* 게임 오버 (개선) */}
-      {gameOver && stackedDonuts.length < 5 && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-xl backdrop-blur-sm"
-        >
-          <motion.h2 
-            className="text-5xl font-black text-white mb-4"
-            initial={{ y: -20 }}
-            animate={{ y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            GAME OVER
-          </motion.h2>
-          <motion.p 
-            className="text-white text-xl mb-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            Score: <span className="font-black text-pink-400">{stackedDonuts.length}</span> / 5
-          </motion.p>
-          <motion.button
-            onClick={handleRestart}
-            className="px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-black rounded-full hover:from-pink-600 hover:to-purple-600 transition shadow-lg"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.6 }}
-          >
-            RETRY
-          </motion.button>
+          <h2 className="text-6xl font-black text-yellow-300 drop-shadow-[4px_4px_0_#000] -rotate-12 whitespace-nowrap">
+            DELICIOUS!
+          </h2>
         </motion.div>
       )}
 
@@ -402,4 +150,3 @@ const DonutGame = ({ onScoreUpdate, onGameClear }) => {
 };
 
 export default DonutGame;
-

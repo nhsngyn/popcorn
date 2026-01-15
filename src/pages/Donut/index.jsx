@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import DonutGame from "./DonutGame";
+import DonutGame from "./DonutGame"; // 👈 핵심!
 
 const Donut = () => {
   const [score, setScore] = useState(0);
@@ -29,17 +29,13 @@ const Donut = () => {
       </div>
 
       {/* 2. [UI] 네온 전광판 */}
-      <motion.div 
-        className="absolute top-8 left-8 z-20"
-        animate={isClear ? { scale: [1, 1.1, 1], rotate: [0, -5, 5, 0] } : {}}
-        transition={{ duration: 0.5, repeat: isClear ? Infinity : 0, repeatDelay: 1 }}
-      >
-        <div className={`bg-black p-4 rounded-xl border-4 ${isClear ? 'border-yellow-400' : 'border-pink-500'} shadow-[0_0_20px_${isClear ? '#fbbf24' : '#ec4899'}] transition-all duration-300`}>
-          <h1 className={`text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r ${isClear ? 'from-yellow-400 to-orange-500' : 'from-pink-500 to-purple-500'} animate-pulse`} style={{ fontFamily: "Impact, sans-serif" }}>
-            {isClear ? "🎉 PERFECT! 🎉" : "STACK A DONUT!"}
+      <div className="absolute top-8 left-8 z-20">
+        <div className={`bg-black p-4 rounded-xl border-4 ${isClear ? 'border-yellow-400' : 'border-pink-500'} shadow-[0_0_20px_#ec4899] transition-colors`}>
+          <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 animate-pulse" style={{ fontFamily: "Impact, sans-serif" }}>
+            {isClear ? "PERFECT!" : "STACK A DONUT!"}
           </h1>
         </div>
-      </motion.div>
+      </div>
 
       {/* 3. [UI] 스코어 보드 */}
       <div className="absolute top-8 right-8 z-20">
@@ -60,18 +56,7 @@ const Donut = () => {
           className="relative w-[600px] h-[300px]"
         >
           {/* 식탁보 */}
-          <motion.div 
-            className="w-full h-full bg-white relative rounded-t-[50px] shadow-2xl overflow-hidden border-t-8 border-white"
-            animate={isClear ? { 
-              boxShadow: [
-                "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-                "0 25px 50px -12px rgba(251, 191, 36, 0.5)",
-                "0 25px 50px -12px rgba(236, 72, 153, 0.5)",
-                "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
-              ]
-            } : {}}
-            transition={{ duration: 2, repeat: isClear ? Infinity : 0 }}
-          >
+          <div className="w-full h-full bg-white relative rounded-t-[50px] shadow-2xl overflow-hidden border-t-8 border-white">
              <div className="absolute inset-0 opacity-30 bg-[#ff9ff3]" 
                   style={{ 
                     backgroundImage: "linear-gradient(#fff 2px, transparent 2px), linear-gradient(90deg, #fff 2px, transparent 2px)",
@@ -79,15 +64,11 @@ const Donut = () => {
                   }} 
              />
              <div className="absolute top-10 w-full text-center pointer-events-none">
-                <motion.p 
-                  className={`text-pink-400 font-bold text-xl ${score > 0 ? 'hidden' : ''}`}
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
+                <p className={`text-pink-400 font-bold text-xl ${score > 0 ? 'hidden' : 'animate-bounce'}`}>
                   CLICK TO DROP! 👇
-                </motion.p>
+                </p>
              </div>
-          </motion.div>
+          </div>
 
           {/* 게임 컴포넌트 위치 */}
           <div className="absolute bottom-[60px] w-full flex justify-center">
