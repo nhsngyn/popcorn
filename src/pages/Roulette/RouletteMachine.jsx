@@ -5,34 +5,25 @@ import { useState } from "react";
 const RouletteMachine = () => {
   const controls = useAnimation();
   const [isSpinning, setIsSpinning] = useState(false);
-  const [result, setResult] = useState(null);
 
   // 룰렛 데이터 (8조각)
   const items = ["JACKPOT", "LOSE", "x2", "LOSE", "BONUS", "LOSE", "x5", "LOSE"];
-  const segmentAngle = 360 / items.length; // 한 조각당 45도
 
   const handleSpin = async () => {
     if (isSpinning) return;
     setIsSpinning(true);
-    setResult(null);
 
-    // 1. 랜덤 회전수 계산 (기본 5바퀴 + 랜덤 각도)
+    // 랜덤 회전수 계산 (기본 5바퀴 + 랜덤 각도)
     const randomOffset = Math.random() * 360;
     const totalRotation = 360 * 5 + randomOffset;
 
-    // 2. 애니메이션 실행 (Framer Motion)
+    // 애니메이션 실행 (Framer Motion)
     await controls.start({
       rotate: totalRotation,
-      transition: { duration: 4, ease: [0.2, 0, 0, 1] }, // power4.out (처음엔 빠르고 나중에 천천히)
+      transition: { duration: 4, ease: [0.2, 0, 0, 1] },
     });
-
-    // 3. 결과 계산 (현재 각도를 360으로 나눈 나머지)
-    // 룰렛이 시계방향(+)으로 돌면, 12시 방향 기준(0도)에서 멈춘 각도를 역산해야 함
-    const finalAngle = totalRotation % 360;
-    // (보정 로직: 뷰포트가 12시가 아니라 '뚫린 구멍' 기준이라 약간의 오차가 있을 수 있음. 시각적 재미 위주로 구현)
     
     setIsSpinning(false);
-    setResult("RESULT OPEN"); // 실제 당첨 로직은 나중에 정교하게 다듬기 가능
   };
 
   return (
