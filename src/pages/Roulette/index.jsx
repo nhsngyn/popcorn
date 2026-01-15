@@ -2,65 +2,81 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import RouletteMachine from "./RouletteMachine";
+import casinoVideo from "../../assets/roulette/Casino.mp4";
 
 const Roulette = () => {
   return (
-    <div className="w-full h-screen bg-black overflow-hidden flex relative font-sans">
+    <div className="w-full h-screen bg-black overflow-hidden relative font-sans">
       
-      {/* 1. 왼쪽: 룰렛 기계 영역 (화면의 60%) - 어둡고 무거운 느낌 */}
-      <div className="w-[60%] h-full bg-[#120808] relative flex items-center justify-end overflow-hidden border-r-4 border-neutral-900 z-10 shadow-[20px_0_50px_rgba(0,0,0,0.8)]">
-        
-        {/* 기계 장식 텍스트 */}
-        <div className="absolute top-10 left-10 text-[#5c3a3a] font-mono text-xs tracking-widest opacity-50">
-          <p>MACHINE_ID: HK-88</p>
-          <p>STATUS: STANDBY</p>
-          <p className="mt-2">CAUTION: HIGH VOLTAGE</p>
-        </div>
+      {/* 1. 전체 화면 홍콩 비디오 배경 */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+      >
+        <source src={casinoVideo} type="video/mp4" />
+      </video>
 
-        {/* 룰렛 위치 잡기 (나중에 실제 룰렛이 들어갈 자리) */}
-       <div className="relative mr-[-120px]"> 
-           <RouletteMachine /> 
-        </div>
+      {/* 2. 어두운 오버레이 (영화 같은 분위기) */}
+      <div className="absolute inset-0 bg-black/70 z-10" /> 
+      <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/20 to-black/50 z-10" />
+      
+      {/* 3. 네온 글로우 효과 강화 */}
+      <motion.div 
+        animate={{ opacity: [0.15, 0.3, 0.15], scale: [1, 1.1, 1] }} 
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-[10%] right-[15%] w-[600px] h-[600px] bg-red-600 rounded-full blur-[200px] opacity-25 z-20" 
+      />
+      <motion.div 
+        animate={{ opacity: [0.1, 0.25, 0.1], scale: [1.1, 1, 1.1] }} 
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        className="absolute bottom-[10%] left-[10%] w-[700px] h-[700px] bg-emerald-500 rounded-full blur-[200px] opacity-20 z-20" 
+      />
+
+      {/* 4. 미묘한 한자 텍스트 레이어 */}
+      <div className="absolute inset-0 flex items-center justify-center z-25 select-none pointer-events-none overflow-hidden">
+         <h1 className="text-[200px] font-black text-red-500/5 tracking-widest blur-[2px] absolute -rotate-12">
+           重慶森林
+         </h1>
       </div>
 
-      {/* 2. 오른쪽: 블러 처리된 홍콩 네온 사인 배경 (화면의 40%) - 몽환적임 */}
-      <div className="w-[40%] h-full relative overflow-hidden bg-black">
-        
-        {/* 네온 사인 이미지 효과 (배경 레이어) */}
-        <div className="absolute inset-0 bg-black/40 z-10" /> 
-        
-        {/* 춤추는 네온 불빛들 (Framer Motion) */}
-        <motion.div 
-          animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.1, 1] }} 
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[10%] right-[10%] w-80 h-80 bg-red-600 rounded-full blur-[120px] opacity-40" 
-        />
-        <motion.div 
-          animate={{ opacity: [0.2, 0.5, 0.2], scale: [1.1, 1, 1.1] }} 
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-[20%] left-[0%] w-96 h-96 bg-emerald-600 rounded-full blur-[120px] opacity-30" 
-        />
+      {/* 5. 중앙에 큰 룰렛 (위에 떠있는 느낌) */}
+      <div className="absolute inset-0 flex items-center justify-center z-30">
+        <RouletteMachine /> 
+      </div>
 
-        {/* 배경 한자 텍스트 (블러 처리되어 분위기만 냄) */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-0 select-none pointer-events-none">
-           <h1 className="text-9xl font-black text-red-600/20 rotate-90 tracking-widest blur-[4px]">
-             重慶
-           </h1>
-           <h1 className="text-9xl font-black text-emerald-600/10 -rotate-90 tracking-widest blur-[6px] absolute scale-150">
-             森林
-           </h1>
-        </div>
-
-        {/* 나가기 버튼 (우측 하단) */}
-        <Link to="/" className="absolute bottom-10 right-10 z-50 group">
-          <div className="w-14 h-14 border border-neutral-700 rounded-full flex items-center justify-center text-neutral-500 transition-all duration-300 group-hover:border-white group-hover:scale-110 group-hover:bg-white group-hover:text-black">
-            <span className="text-xl">✕</span>
-          </div>
-          <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] text-neutral-600 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-            LOBBY
+      {/* 6. 피들스틱 레버 스타일 나가기 버튼 (우측 하단) */}
+      <Link to="/" className="absolute bottom-12 right-12 z-50 group">
+        <div className="relative flex flex-col items-center">
+          {/* 레버 손잡이 (둥근 구) */}
+          <motion.div 
+            className="w-12 h-12 bg-gradient-to-br from-red-600 to-red-900 rounded-full border-2 border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.5)] flex items-center justify-center mb-1 cursor-pointer"
+            whileHover={{ scale: 1.15, boxShadow: "0 0 30px rgba(239,68,68,0.8)" }}
+            whileTap={{ scale: 0.95, y: 8 }}
+          >
+            <span className="text-white text-xl font-bold">✕</span>
+          </motion.div>
+          
+          {/* 레버 막대 */}
+          <motion.div 
+            className="w-2 h-20 bg-gradient-to-b from-neutral-600 to-neutral-800 rounded-full shadow-lg relative"
+            whileHover={{ scaleY: 1.05 }}
+          >
+            {/* 금속 반사 효과 */}
+            <div className="absolute inset-y-0 left-0 w-[1px] bg-white/30" />
+          </motion.div>
+          
+          {/* 레버 받침대 */}
+          <div className="w-8 h-4 bg-gradient-to-b from-neutral-700 to-neutral-900 rounded-t-sm shadow-xl border-t border-neutral-600" />
+          
+          {/* 텍스트 레이블 */}
+          <span className="mt-2 text-[10px] text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap tracking-wider">
+            EXIT
           </span>
-        </Link>
-      </div>
+        </div>
+      </Link>
 
     </div>
   );
