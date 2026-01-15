@@ -25,16 +25,61 @@ const MahjongCinema = () => {
   const [cardFrontImages, setCardFrontImages] = useState([]);
   const [videoEnded, setVideoEnded] = useState(false);
   const [canInteract, setCanInteract] = useState(false);
+  const [isShuffling, setIsShuffling] = useState(false); // 섞는 중 상태 추가
 
   // 앞면 이미지 배열
   const frontImages = useRef([front1Img, front2Img, front3Img, front4Img]).current;
 
+  // 카드 섞기 함수 (명확한 3단계 순서)
+  const shuffleCards = () => {
+    if (isShuffling) return; // 이미 섞는 중이면 중복 실행 방지
+    
+    setIsShuffling(true);
+    console.log("🔄 SHUFFLE 시작");
+    
+    // === 1단계: 모든 패가 뒷면인지 확인 ===
+    const hasFlippedCards = flippedCards.some(card => card === true);
+    console.log("1단계: 뒷면 확인 -", hasFlippedCards ? "앞면 있음" : "모두 뒷면");
+    
+    if (hasFlippedCards) {
+      // === 2단계: 앞면 카드가 있다면 뒷면으로 뒤집기 ===
+      console.log("2단계: 모든 카드를 뒷면으로 뒤집는 중...");
+      setFlippedCards(Array(5).fill(false));
+      
+      // 뒤집는 애니메이션 완료 대기 (0.6초 애니메이션 + 0.2초 여유)
+      setTimeout(() => {
+        console.log("2단계 완료: 모든 카드가 뒷면이 됨");
+        
+        // === 3단계: 패의 앞면을 랜덤으로 재설정 ===
+        console.log("3단계: 패의 앞면 랜덤 재설정 중...");
+        const randomFronts = Array(5)
+          .fill(null)
+          .map(() => frontImages[Math.floor(Math.random() * frontImages.length)]);
+        setCardFrontImages(randomFronts);
+        console.log("3단계 완료: 새로운 패 할당됨");
+        console.log("✅ SHUFFLE 완료");
+        
+        setIsShuffling(false);
+      }, 800);
+    } else {
+      // 이미 모든 카드가 뒷면이면 2단계 스킵하고 바로 3단계
+      console.log("2단계 스킵: 이미 모두 뒷면");
+      console.log("3단계: 패의 앞면 랜덤 재설정 중...");
+      
+      const randomFronts = Array(5)
+        .fill(null)
+        .map(() => frontImages[Math.floor(Math.random() * frontImages.length)]);
+      setCardFrontImages(randomFronts);
+      console.log("3단계 완료: 새로운 패 할당됨");
+      console.log("✅ SHUFFLE 완료");
+      
+      setIsShuffling(false);
+    }
+  };
+
   useEffect(() => {
     // 각 카드에 랜덤 앞면 이미지 할당
-    const randomFronts = Array(5)
-      .fill(null)
-      .map(() => frontImages[Math.floor(Math.random() * frontImages.length)]);
-    setCardFrontImages(randomFronts);
+    shuffleCards();
 
     // 비디오 재생 속도 동적 변화
     const video = videoRef.current;
@@ -177,7 +222,7 @@ const MahjongCinema = () => {
 
   // === 카드 뒤집기 핸들러 (토글 방식) ===
   const handleFlipCard = (index) => {
-    if (!canInteract) return;
+    if (!canInteract || isShuffling) return; // 섞는 중에는 클릭 불가
 
     console.log(`Toggling card ${index}`);
 
@@ -185,6 +230,16 @@ const MahjongCinema = () => {
     const newFlippedCards = [...flippedCards];
     newFlippedCards[index] = !newFlippedCards[index];
     setFlippedCards(newFlippedCards);
+  };
+
+  // === 비디오 스킵 핸들러 ===
+  const handleSkipVideo = () => {
+    const video = videoRef.current;
+    if (video && !videoEnded) {
+      video.pause();
+      video.currentTime = video.duration; // 영상 끝으로 이동
+      // ended 이벤트가 자동으로 발생함
+    }
   };
 
   return (
@@ -307,35 +362,83 @@ const MahjongCinema = () => {
         </div>
       </div>
 
-      {/* === LAYER 5: 피들스틱 레버 (Exit Button) === */}
-      <Link to="/" className="absolute bottom-12 right-12 z-50 group">
-        <div className="relative flex flex-col items-center">
-          {/* 레버 손잡이 */}
-          <motion.div 
-            className="w-12 h-12 bg-gradient-to-br from-red-600 to-red-900 rounded-full border-2 border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.5)] flex items-center justify-center mb-1 cursor-pointer"
-            whileHover={{ scale: 1.15, boxShadow: "0 0 30px rgba(239,68,68,0.8)" }}
-            whileTap={{ scale: 0.95, y: 8 }}
+      {/* === LAYER 5: 좌측 하단 - SKIP 버튼 (인트로 중) === */}
+      {!videoEnded && (
+        <div className="absolute bottom-12 left-12 z-50">
+          <motion.button
+            onClick={handleSkipVideo}
+            className="group relative"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
           >
-            <span className="text-white text-xl font-bold">✕</span>
-          </motion.div>
-          
-          {/* 레버 막대 */}
-          <motion.div 
-            className="w-2 h-20 bg-gradient-to-b from-neutral-600 to-neutral-800 rounded-full shadow-lg relative"
-            whileHover={{ scaleY: 1.05 }}
-          >
-            <div className="absolute inset-y-0 left-0 w-[1px] bg-white/30" />
-          </motion.div>
-          
-          {/* 레버 받침대 */}
-          <div className="w-8 h-4 bg-gradient-to-b from-neutral-700 to-neutral-900 rounded-t-sm shadow-xl border-t border-neutral-600" />
-          
-          {/* 텍스트 레이블 */}
-          <span className="mt-2 text-[10px] text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap tracking-wider">
-            EXIT
-          </span>
+            <div className="w-16 h-16 bg-gradient-to-br from-yellow-600 to-yellow-900 rounded-lg border-2 border-yellow-400 shadow-[0_0_20px_rgba(234,179,8,0.5)] group-hover:shadow-[0_0_30px_rgba(234,179,8,0.8)] flex items-center justify-center transition-all duration-300">
+              <span className="text-white text-2xl font-bold">⏭</span>
+            </div>
+            <span className="absolute -right-2 top-1/2 -translate-y-1/2 translate-x-full text-[10px] text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap tracking-wider pl-2">
+              SKIP INTRO
+            </span>
+          </motion.button>
         </div>
-      </Link>
+      )}
+
+      {/* === LAYER 6: 우측 하단 - SHUFFLE & EXIT 버튼들 === */}
+      <div className="absolute bottom-12 right-12 z-50 flex flex-col gap-4">
+        
+        {/* SHUFFLE 버튼 (카드 인터랙션 활성화 후) */}
+        {canInteract && (
+          <motion.button
+            onClick={shuffleCards}
+            disabled={isShuffling}
+            className="group relative"
+            whileHover={{ scale: isShuffling ? 1 : 1.05 }}
+            whileTap={{ scale: isShuffling ? 1 : 0.95 }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1 }}
+          >
+            <div className={`w-16 h-16 bg-gradient-to-br from-emerald-600 to-emerald-900 rounded-lg border-2 border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.5)] group-hover:shadow-[0_0_30px_rgba(16,185,129,0.8)] flex items-center justify-center transition-all duration-300 ${isShuffling ? 'opacity-50 cursor-not-allowed' : ''}`}>
+              {isShuffling ? (
+                <span className="text-white text-2xl animate-spin">🔄</span>
+              ) : (
+                <img 
+                  src={backImg} 
+                  alt="Shuffle" 
+                  className="w-10 h-10 object-contain"
+                />
+              )}
+            </div>
+            <span className="absolute -left-2 top-1/2 -translate-y-1/2 -translate-x-full text-[10px] text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap tracking-wider pr-2">
+              {isShuffling ? 'SHUFFLING...' : 'SHUFFLE'}
+            </span>
+          </motion.button>
+        )}
+
+        {/* EXIT 버튼 (항상 표시) */}
+        <Link to="/" className="group relative">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: videoEnded ? 1.5 : 0.5 }}
+          >
+            <div className="w-16 h-16 bg-gradient-to-br from-red-600 to-red-900 rounded-lg border-2 border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.5)] group-hover:shadow-[0_0_30px_rgba(239,68,68,0.8)] flex items-center justify-center transition-all duration-300">
+              <img 
+                src={front1Img} 
+                alt="Exit" 
+                className="w-10 h-10 object-contain"
+              />
+            </div>
+            <span className="absolute -left-2 top-1/2 -translate-y-1/2 -translate-x-full text-[10px] text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap tracking-wider pr-2">
+              EXIT
+            </span>
+          </motion.div>
+        </Link>
+
+      </div>
 
     </div>
   );
