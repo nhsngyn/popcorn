@@ -2,41 +2,83 @@
 import { motion, useAnimation } from "framer-motion";
 import { useState } from "react";
 
+// ============================================
+// 상수 정의 (Magic Numbers 제거)
+// ============================================
+const CONFIG = {
+  // 룰렛 크기
+  SIZE: {
+    WIDTH: 700,
+    HEIGHT: 700,
+  },
+  
+  // 룰렛 회전 설정
+  SPIN: {
+    BASE_ROTATIONS: 5,        // 기본 회전 수
+    DURATION: 4,              // 애니메이션 지속 시간 (초)
+    EASING: [0.2, 0, 0, 1],  // power4.out
+  },
+  
+  // 룰렛 조각 설정
+  SEGMENT_COUNT: 8,
+  SEGMENT_ANGLE: 45,           // 360 / 8
+  SEGMENT_OFFSET: 22.5,        // 45 / 2
+  
+  // 뷰포트 (보이는 구간)
+  VIEWPORT: {
+    START_ANGLE: 330,
+    END_ANGLE: 30,
+  },
+  
+  // UI 크기
+  UI: {
+    BUTTON_SIZE: 128,          // 32 * 4 (w-32 = 128px)
+    ARROW_TOP_OFFSET: -30,
+    ARROW_WIDTH: 20,
+    ARROW_HEIGHT: 45,
+  },
+};
+
 const RouletteMachine = () => {
   const controls = useAnimation();
   const [isSpinning, setIsSpinning] = useState(false);
   const [result, setResult] = useState(null);
 
-  // 룰렛 데이터 (8조각)
+  // 룰렛 데이터
   const items = ["JACKPOT", "LOSE", "x2", "LOSE", "BONUS", "LOSE", "x5", "LOSE"];
-  const segmentAngle = 360 / items.length; // 한 조각당 45도
 
   const handleSpin = async () => {
     if (isSpinning) return;
     setIsSpinning(true);
     setResult(null);
 
-    // 1. 랜덤 회전수 계산 (기본 5바퀴 + 랜덤 각도)
+    // 랜덤 회전수 계산
     const randomOffset = Math.random() * 360;
-    const totalRotation = 360 * 5 + randomOffset;
+    const totalRotation = 360 * CONFIG.SPIN.BASE_ROTATIONS + randomOffset;
 
-    // 2. 애니메이션 실행 (Framer Motion)
+    // 애니메이션 실행
     await controls.start({
       rotate: totalRotation,
-      transition: { duration: 4, ease: [0.2, 0, 0, 1] }, // power4.out (처음엔 빠르고 나중에 천천히)
+      transition: { 
+        duration: CONFIG.SPIN.DURATION, 
+        ease: CONFIG.SPIN.EASING,
+      },
     });
 
-    // 3. 결과 계산 (현재 각도를 360으로 나눈 나머지)
-    // 룰렛이 시계방향(+)으로 돌면, 12시 방향 기준(0도)에서 멈춘 각도를 역산해야 함
     const finalAngle = totalRotation % 360;
-    // (보정 로직: 뷰포트가 12시가 아니라 '뚫린 구멍' 기준이라 약간의 오차가 있을 수 있음. 시각적 재미 위주로 구현)
     
     setIsSpinning(false);
-    setResult("RESULT OPEN"); // 실제 당첨 로직은 나중에 정교하게 다듬기 가능
+    setResult("RESULT OPEN");
   };
 
   return (
-    <div className="relative w-[700px] h-[700px] flex items-center justify-center">
+    <div 
+      className="relative flex items-center justify-center"
+      style={{ 
+        width: `${CONFIG.SIZE.WIDTH}px`, 
+        height: `${CONFIG.SIZE.HEIGHT}px` 
+      }}
+    >
       
       {/* 1. [LAYER: BOTTOM] 실제 돌아가는 룰렛 판 */}
       <motion.div
@@ -62,7 +104,9 @@ const RouletteMachine = () => {
           <div
             key={i}
             className="absolute top-0 left-1/2 -translate-x-1/2 h-[50%] origin-bottom flex justify-center pt-8"
-            style={{ transform: `translateX(-50%) rotate(${i * 45 + 22.5}deg)` }}
+            style={{ 
+              transform: `translateX(-50%) rotate(${i * CONFIG.SEGMENT_ANGLE + CONFIG.SEGMENT_OFFSET}deg)` 
+            }}
           >
             <span className="text-white font-bold text-2xl drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] rotate-180 writing-mode-vertical">
               {item}
@@ -75,9 +119,7 @@ const RouletteMachine = () => {
       <div 
         className="absolute w-[110%] h-[110%] rounded-full pointer-events-none z-10 shadow-[inset_0_0_80px_rgba(0,0,0,0.9)]"
         style={{
-          // 투명(transparent)에서 시작해서 60도까지만 보여주고, 나머지는 다 가림(#120808)
-          background: "conic-gradient(transparent 330deg 30deg, rgba(18,8,8,0.95) 30deg 330deg)"
-          // 설명: 12시 방향(0도)을 기준으로 -30도 ~ +30도 (총 60도) 부채꼴만 뚫어버림
+          background: `conic-gradient(transparent ${CONFIG.VIEWPORT.START_ANGLE}deg ${CONFIG.VIEWPORT.END_ANGLE}deg, rgba(18,8,8,0.95) ${CONFIG.VIEWPORT.END_ANGLE}deg ${CONFIG.VIEWPORT.START_ANGLE}deg)`
         }}
       >
         {/* 커버 위에 디테일 장식 (나사못 등) */}
@@ -87,15 +129,29 @@ const RouletteMachine = () => {
       </div>
 
       {/* 3. [LAYER: TOP] 화살표 (포인터) */}
-      <div className="absolute top-[-30px] left-1/2 -translate-x-1/2 z-20">
-         <div className="w-0 h-0 border-l-[20px] border-l-transparent border-r-[20px] border-r-transparent border-t-[45px] border-t-red-600 drop-shadow-[0_0_20px_rgba(255,0,0,1)]" />
+      <div 
+        className="absolute left-1/2 -translate-x-1/2 z-20"
+        style={{ top: `${CONFIG.UI.ARROW_TOP_OFFSET}px` }}
+      >
+        <div 
+          className="w-0 h-0 border-l-transparent border-r-transparent border-t-red-600 drop-shadow-[0_0_20px_rgba(255,0,0,1)]"
+          style={{
+            borderLeftWidth: `${CONFIG.UI.ARROW_WIDTH}px`,
+            borderRightWidth: `${CONFIG.UI.ARROW_WIDTH}px`,
+            borderTopWidth: `${CONFIG.UI.ARROW_HEIGHT}px`,
+          }}
+        />
       </div>
 
       {/* 4. [CONTROL] 스핀 버튼 (중앙) */}
       <button
         onClick={handleSpin}
         disabled={isSpinning}
-        className="absolute z-30 w-32 h-32 bg-gradient-to-br from-red-900 to-black rounded-full border-6 border-[#5c3a3a] shadow-[0_0_40px_rgba(255,0,0,0.5)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-[0_0_60px_rgba(255,0,0,0.8)]"
+        className="absolute z-30 bg-gradient-to-br from-red-900 to-black rounded-full border-6 border-[#5c3a3a] shadow-[0_0_40px_rgba(255,0,0,0.5)] flex items-center justify-center active:scale-95 transition-transform hover:shadow-[0_0_60px_rgba(255,0,0,0.8)]"
+        style={{
+          width: `${CONFIG.UI.BUTTON_SIZE}px`,
+          height: `${CONFIG.UI.BUTTON_SIZE}px`,
+        }}
       >
         <span className={`text-white font-bold text-2xl ${isSpinning ? 'opacity-50' : 'animate-pulse'}`}>
           {isSpinning ? "..." : "SPIN"}
