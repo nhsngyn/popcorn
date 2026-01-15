@@ -34,7 +34,7 @@ const Lobby = () => {
           {/* 상영작 선택 카드 (추후 3D로 교체 가능) */}
           <div className="flex gap-10 items-center justify-center perspective-1000">
             
-            {/* 1. 룰렛 (홍콩) */}
+            {/* 1. 마작 (홍콩) */}
             <Link to="/roulette">
               <motion.div 
                 whileHover={{ y: -20, scale: 1.05 }}
@@ -45,9 +45,9 @@ const Lobby = () => {
                 
                 {/* 아이콘/콘텐츠 */}
                 <div className="w-full h-full flex flex-col items-center justify-center relative z-10">
-                  <span className="text-6xl mb-4 group-hover:blur-[2px] transition-all duration-300">🎡</span>
+                  <span className="text-6xl mb-4 group-hover:blur-[2px] transition-all duration-300">🀄</span>
                   <h3 className="text-2xl font-bold text-neutral-300 group-hover:text-red-500 transition-colors">Night in HK</h3>
-                  <p className="text-xs text-neutral-500 mt-2 uppercase tracking-wider">Roulette</p>
+                  <p className="text-xs text-neutral-500 mt-2 uppercase tracking-wider">Interactive Tiles</p>
                 </div>
               </motion.div>
             </Link>
