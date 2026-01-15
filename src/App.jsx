@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 // 페이지들 불러오기
 import Lobby from './pages/Lobby';
-import MahjongCinema from './pages/Roulette/MahjongCinema';
+import MahjongCinema from './pages/Mahjong/MahjongCinema';
 import Scratch from './pages/Scratch';
 import Donut from './pages/Donut';
 

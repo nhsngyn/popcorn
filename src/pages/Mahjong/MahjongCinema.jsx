@@ -1,4 +1,4 @@
-// src/pages/Roulette/MahjongCinema.jsx
+// src/pages/Mahjong/MahjongCinema.jsx
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { Link } from "react-router-dom";
