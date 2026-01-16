@@ -81,7 +81,7 @@ const Donut = () => {
       </div>
 
       {/* 나가기 버튼 */}
-      <Link to="/" className="absolute bottom-8 right-8 z-50 group">
+      <Link to="/?skipIntro=true" className="absolute bottom-8 right-8 z-50 group">
         <div className="w-16 h-16 bg-yellow-400 rounded-full border-4 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all hover:bg-yellow-300">
            <span className="font-bold text-black text-sm">EXIT</span>
         </div>

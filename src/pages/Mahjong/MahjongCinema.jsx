@@ -1,4 +1,4 @@
-// src/pages/Roulette/MahjongCinema.jsx
+// src/pages/Mahjong/MahjongCinema.jsx
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { Link } from "react-router-dom";
@@ -35,46 +35,28 @@ const MahjongCinema = () => {
 
   // 카드 섞기 함수 (명확한 3단계 순서)
   const shuffleCards = () => {
-    if (isShuffling) return; // 이미 섞는 중이면 중복 실행 방지
+    if (isShuffling) return;
     
     setIsShuffling(true);
-    console.log("🔄 SHUFFLE 시작");
     
-    // === 1단계: 모든 패가 뒷면인지 확인 ===
     const hasFlippedCards = flippedCards.some(card => card === true);
-    console.log("1단계: 뒷면 확인 -", hasFlippedCards ? "앞면 있음" : "모두 뒷면");
     
     if (hasFlippedCards) {
-      // === 2단계: 앞면 카드가 있다면 뒷면으로 뒤집기 ===
-      console.log("2단계: 모든 카드를 뒷면으로 뒤집는 중...");
       setFlippedCards(Array(5).fill(false));
       
-      // 뒤집는 애니메이션 완료 대기 (0.6초 애니메이션 + 0.2초 여유)
       setTimeout(() => {
-        console.log("2단계 완료: 모든 카드가 뒷면이 됨");
-        
-        // === 3단계: 패의 앞면을 랜덤으로 재설정 ===
-        console.log("3단계: 패의 앞면 랜덤 재설정 중...");
         const randomFronts = Array(5)
           .fill(null)
           .map(() => frontImages[Math.floor(Math.random() * frontImages.length)]);
         setCardFrontImages(randomFronts);
-        console.log("3단계 완료: 새로운 패 할당됨");
-        console.log("✅ SHUFFLE 완료");
         
         setIsShuffling(false);
       }, 800);
     } else {
-      // 이미 모든 카드가 뒷면이면 2단계 스킵하고 바로 3단계
-      console.log("2단계 스킵: 이미 모두 뒷면");
-      console.log("3단계: 패의 앞면 랜덤 재설정 중...");
-      
       const randomFronts = Array(5)
         .fill(null)
         .map(() => frontImages[Math.floor(Math.random() * frontImages.length)]);
       setCardFrontImages(randomFronts);
-      console.log("3단계 완료: 새로운 패 할당됨");
-      console.log("✅ SHUFFLE 완료");
       
       setIsShuffling(false);
     }
@@ -145,13 +127,12 @@ const MahjongCinema = () => {
 
     // === 비디오 종료 이벤트 핸들러 ===
     const handleVideoEnd = () => {
-      console.log("Video ended - transitioning to table");
       setVideoEnded(true);
 
       // 비디오 최적화: 완전히 정지 및 언로드
       if (video) {
         video.pause();
-        video.src = ""; // 메모리 해제
+        video.src = "";
         video.load();
       }
 
@@ -202,15 +183,6 @@ const MahjongCinema = () => {
 
     if (video) {
       video.addEventListener("ended", handleVideoEnd);
-      
-      // 비디오 로드 확인
-      video.addEventListener("loadeddata", () => {
-        console.log("Video loaded successfully");
-      });
-
-      video.addEventListener("error", (e) => {
-        console.error("Video error:", e);
-      });
     }
 
     // Cleanup
@@ -225,11 +197,8 @@ const MahjongCinema = () => {
 
   // === 카드 뒤집기 핸들러 (토글 방식) ===
   const handleFlipCard = (index) => {
-    if (!canInteract || isShuffling) return; // 섞는 중에는 클릭 불가
+    if (!canInteract || isShuffling) return;
 
-    console.log(`Toggling card ${index}`);
-
-    // 상태 토글 (뒤집기/되돌리기)
     const newFlippedCards = [...flippedCards];
     newFlippedCards[index] = !newFlippedCards[index];
     setFlippedCards(newFlippedCards);
@@ -413,8 +382,10 @@ const MahjongCinema = () => {
           />
         )}
 
-        {/* EXIT 버튼 */}
-        <Link to="/" className="group relative">
+
+        {/* EXIT 버튼 (항상 표시) */}
+        <Link to="/?skipIntro=true" className="group relative">
+b8f3e0a02c093bbbf7e747b41970450ad98b789b:src/pages/Mahjong/MahjongCinema.jsx
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
