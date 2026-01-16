@@ -15,7 +15,7 @@ const Lobby = () => {
       subtitle: "Interactive Tiles",
       icon: "🀄",
       color: "red",
-      spotlightColor: "rgba(220, 38, 38, 0.6)", // red-600
+      spotlightColor: "rgba(220, 38, 38, 0.7)", // red-600
     },
     {
       id: 2,
@@ -24,7 +24,7 @@ const Lobby = () => {
       subtitle: "Scratch",
       icon: "🧵",
       color: "blue",
-      spotlightColor: "rgba(37, 99, 235, 0.6)", // blue-600
+      spotlightColor: "rgba(37, 99, 235, 0.7)", // blue-600
     },
     {
       id: 3,
@@ -33,7 +33,7 @@ const Lobby = () => {
       subtitle: "Stacking",
       icon: "🍩",
       color: "yellow",
-      spotlightColor: "rgba(234, 179, 8, 0.6)", // yellow-600
+      spotlightColor: "rgba(234, 179, 8, 0.7)", // yellow-600
     },
   ];
 
@@ -48,26 +48,6 @@ const Lobby = () => {
         {/* 어두운 오버레이 (카드가 더 잘 보이도록) */}
         <div className="absolute inset-0 bg-black/30" />
       </div>
-
-      {/* 스포트라이트 효과 (호버 시) */}
-      {hoveredCard !== null && (
-        <motion.div
-          className="absolute pointer-events-none z-10"
-          style={{
-            top: "20%",
-            left: `${30 + hoveredCard * 20}%`,
-            width: "400px",
-            height: "400px",
-            background: `radial-gradient(circle, ${shows[hoveredCard].spotlightColor} 0%, transparent 70%)`,
-            filter: "blur(40px)",
-            transform: "translateX(-50%)",
-          }}
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.4 }}
-        />
-      )}
 
       {/* 메인 컨텐츠 */}
       <div className="relative w-full h-full flex flex-col items-center justify-center z-10">
@@ -90,7 +70,7 @@ const Lobby = () => {
         </motion.div>
 
         {/* 상영작 카드들 */}
-        <div className="flex gap-16 items-end justify-center">
+        <div className="flex gap-8 items-end justify-center">
           {shows.map((show, index) => (
             <Link
               key={show.id}
@@ -103,18 +83,38 @@ const Lobby = () => {
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.8 + index * 0.2 }}
-                whileHover={{ y: -30, scale: 1.05 }}
+                whileHover={{ y: -30, scale: 1.05, transition: { duration: 0.2 } }}
               >
-                {/* 카드 본체 */}
+                {/* 스포트라이트 효과 (카드 바로 위) */}
+                {hoveredCard === index && (
+                  <motion.div
+                    className="absolute pointer-events-none z-0"
+                    style={{
+                      top: "-120px",
+                      left: "50%",
+                      width: "300px",
+                      height: "300px",
+                      background: `radial-gradient(circle, ${show.spotlightColor} 0%, transparent 70%)`,
+                      filter: "blur(50px)",
+                      transform: "translateX(-50%)",
+                    }}
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                )}
+
+                {/* 카드 본체 - 영화 티켓 스타일 */}
                 <div className={`
-                  relative w-56 h-80 bg-gradient-to-b from-neutral-800 to-neutral-900
+                  relative w-40 h-64 bg-gradient-to-b from-neutral-800 to-neutral-900
                   border-2 ${
                     hoveredCard === index 
                       ? `border-${show.color}-500 shadow-[0_0_40px_rgba(${show.color === 'red' ? '220,38,38' : show.color === 'blue' ? '37,99,235' : '234,179,8'},0.6)]`
                       : 'border-neutral-700'
                   }
-                  rounded-lg overflow-hidden
-                  transition-all duration-500
+                  rounded-2xl overflow-hidden
+                  transition-all duration-300
                 `}>
                   
                   {/* 스포트라이트 받는 효과 */}
@@ -122,32 +122,41 @@ const Lobby = () => {
                     absolute inset-0 
                     ${hoveredCard === index ? 'opacity-100' : 'opacity-0'}
                     bg-gradient-to-b from-white/10 to-transparent
-                    transition-opacity duration-500
+                    transition-opacity duration-300
                   `} />
 
                   {/* 콘텐츠 */}
-                  <div className="relative w-full h-full flex flex-col items-center justify-center p-6 z-10">
+                  <div className="relative w-full h-full flex flex-col items-center justify-center p-4 z-10">
                     <motion.span 
-                      className="text-7xl mb-6"
-                      animate={hoveredCard === index ? { scale: [1, 1.1, 1] } : {}}
-                      transition={{ duration: 0.6, repeat: Infinity }}
+                      className="text-5xl mb-4"
+                      whileHover={{ scale: 1.2 }}
+                      transition={{ duration: 0.2 }}
                     >
                       {show.icon}
                     </motion.span>
-                    <h3 className={`
-                      text-2xl font-bold text-center mb-2
-                      ${hoveredCard === index ? `text-${show.color}-400` : 'text-neutral-300'}
-                      transition-colors duration-300
-                    `}>
+                    <h3 className="text-lg font-bold text-center mb-2 text-neutral-300">
                       {show.title}
                     </h3>
-                    <p className="text-xs text-neutral-500 uppercase tracking-widest">
+                    <p className="text-[10px] text-neutral-500 uppercase tracking-widest">
                       {show.subtitle}
                     </p>
 
-                    {/* 티켓 스타일 장식 */}
-                    <div className="absolute top-4 right-4 w-8 h-8 border-2 border-neutral-600 rounded-full opacity-30" />
-                    <div className="absolute bottom-4 left-4 w-8 h-8 border-2 border-neutral-600 rounded-full opacity-30" />
+                    {/* 티켓 펀치홀 장식 (상단) */}
+                    <div className="absolute top-3 left-1/2 -translate-x-1/2 flex gap-2">
+                      <div className="w-3 h-3 border border-neutral-600 rounded-full opacity-40" />
+                      <div className="w-3 h-3 border border-neutral-600 rounded-full opacity-40" />
+                      <div className="w-3 h-3 border border-neutral-600 rounded-full opacity-40" />
+                    </div>
+
+                    {/* 티켓 펀치홀 장식 (하단) */}
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+                      <div className="w-3 h-3 border border-neutral-600 rounded-full opacity-40" />
+                      <div className="w-3 h-3 border border-neutral-600 rounded-full opacity-40" />
+                      <div className="w-3 h-3 border border-neutral-600 rounded-full opacity-40" />
+                    </div>
+
+                    {/* 티켓 중앙 점선 */}
+                    <div className="absolute left-0 right-0 top-1/2 h-[1px] border-t border-dashed border-neutral-700 opacity-30" />
                   </div>
 
                   {/* 하단 그림자 */}
@@ -175,7 +184,7 @@ const Lobby = () => {
       {/* 빈티지 필름 그레인 효과 */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-30"
            style={{
-             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E")`,
+             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulance type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E")`,
            }} />
     </div>
   );
