@@ -16,6 +16,37 @@ import front3Img from "../../assets/roulette/front3.png";
 import front4Img from "../../assets/roulette/front4.png";
 import backImg from "../../assets/roulette/back.png";
 
+// ============================================
+// 상수 정의 (Magic Numbers 제거)
+// ============================================
+const CONFIG = {
+  // 카드 설정
+  CARD_COUNT: 5,
+  CARD_FLIP_DURATION: 600, // ms
+  CARD_FLIP_BUFFER: 200, // ms (애니메이션 완료 여유 시간)
+  
+  // 비디오 속도 설정
+  VIDEO_SPEED: {
+    INTRO: 1.5,    // 초반 30%
+    MIDDLE: 1.2,   // 중간 30-70%
+    OUTRO: 1.5,    // 마무리 70-100%
+  },
+  VIDEO_SPEED_BREAKPOINTS: {
+    INTRO_END: 0.3,
+    MIDDLE_END: 0.7,
+  },
+  
+  // GSAP 애니메이션 설정
+  ANIMATION: {
+    TABLE_SCALE_INITIAL: 1.3,
+    TABLE_SCALE_FINAL: 1.0,
+    TABLE_TRANSITION_DURATION: 2, // seconds
+    CARD_CONTAINER_TRANSITION_DURATION: 1, // seconds
+    CARD_APPEAR_DURATION: 0.4, // seconds
+    CARD_APPEAR_OVERLAP: 0.3, // seconds
+  },
+};
+
 const MahjongCinema = () => {
   // Refs
   const videoRef = useRef(null);
@@ -24,11 +55,11 @@ const MahjongCinema = () => {
   const cardRefs = useRef([]);
 
   // State
-  const [flippedCards, setFlippedCards] = useState(Array(5).fill(false));
+  const [flippedCards, setFlippedCards] = useState(Array(CONFIG.CARD_COUNT).fill(false));
   const [cardFrontImages, setCardFrontImages] = useState([]);
   const [videoEnded, setVideoEnded] = useState(false);
   const [canInteract, setCanInteract] = useState(false);
-  const [isShuffling, setIsShuffling] = useState(false); // 섞는 중 상태 추가
+  const [isShuffling, setIsShuffling] = useState(false);
 
   // 앞면 이미지 배열
   const frontImages = useRef([front1Img, front2Img, front3Img, front4Img]).current;
@@ -42,18 +73,37 @@ const MahjongCinema = () => {
     const hasFlippedCards = flippedCards.some(card => card === true);
     
     if (hasFlippedCards) {
+<<<<<<< HEAD:src/pages/Roulette/MahjongCinema.jsx
+      console.log("2단계: 모든 카드를 뒷면으로 뒤집는 중...");
+      setFlippedCards(Array(CONFIG.CARD_COUNT).fill(false));
+      
+      const flipWaitTime = CONFIG.CARD_FLIP_DURATION + CONFIG.CARD_FLIP_BUFFER;
+      setTimeout(() => {
+        console.log("2단계 완료: 모든 카드가 뒷면이 됨");
+        console.log("3단계: 패의 앞면 랜덤 재설정 중...");
+        
+        const randomFronts = Array(CONFIG.CARD_COUNT)
+=======
       setFlippedCards(Array(5).fill(false));
       
       setTimeout(() => {
         const randomFronts = Array(5)
+>>>>>>> 79c27df620860ee5fd2a2150fd1842c166731c43:src/pages/Mahjong/MahjongCinema.jsx
           .fill(null)
           .map(() => frontImages[Math.floor(Math.random() * frontImages.length)]);
         setCardFrontImages(randomFronts);
         
         setIsShuffling(false);
-      }, 800);
+      }, flipWaitTime);
     } else {
+<<<<<<< HEAD:src/pages/Roulette/MahjongCinema.jsx
+      console.log("2단계 스킵: 이미 모두 뒷면");
+      console.log("3단계: 패의 앞면 랜덤 재설정 중...");
+      
+      const randomFronts = Array(CONFIG.CARD_COUNT)
+=======
       const randomFronts = Array(5)
+>>>>>>> 79c27df620860ee5fd2a2150fd1842c166731c43:src/pages/Mahjong/MahjongCinema.jsx
         .fill(null)
         .map(() => frontImages[Math.floor(Math.random() * frontImages.length)]);
       setCardFrontImages(randomFronts);
@@ -77,26 +127,22 @@ const MahjongCinema = () => {
 
         if (duration) {
           const progress = currentTime / duration;
+          const { INTRO_END, MIDDLE_END } = CONFIG.VIDEO_SPEED_BREAKPOINTS;
+          const { INTRO, MIDDLE, OUTRO } = CONFIG.VIDEO_SPEED;
 
-          // 초반 (0~30%): 1.5배속
-          if (progress < 0.3) {
-            video.playbackRate = 1.5;
-          }
-          // 중간 (30~70%): 1.2배속
-          else if (progress >= 0.3 && progress < 0.7) {
-            video.playbackRate = 1.2;
-          }
-          // 마무리 (70~100%): 1.5배속
-          else {
-            video.playbackRate = 1.5;
+          if (progress < INTRO_END) {
+            video.playbackRate = INTRO;
+          } else if (progress >= INTRO_END && progress < MIDDLE_END) {
+            video.playbackRate = MIDDLE;
+          } else {
+            video.playbackRate = OUTRO;
           }
         }
       }
     };
 
     if (video) {
-      // 초기 속도 1.5배
-      video.playbackRate = 1.5;
+      video.playbackRate = CONFIG.VIDEO_SPEED.INTRO;
       video.addEventListener("timeupdate", handleTimeUpdate);
     }
 
@@ -104,7 +150,7 @@ const MahjongCinema = () => {
     const ctx = gsap.context(() => {
       // === 초기 상태 설정 ===
       gsap.set(tableBgRef.current, {
-        scale: 1.3,
+        scale: CONFIG.ANIMATION.TABLE_SCALE_INITIAL,
         opacity: 0,
       });
 
@@ -141,9 +187,9 @@ const MahjongCinema = () => {
 
       // 1. 테이블 이미지 등장 (줌인하며 페이드인)
       tl.to(tableBgRef.current, {
-        scale: 1.0,
+        scale: CONFIG.ANIMATION.TABLE_SCALE_FINAL,
         opacity: 1,
-        duration: 2,
+        duration: CONFIG.ANIMATION.TABLE_TRANSITION_DURATION,
         ease: "power2.out",
       });
 
@@ -153,7 +199,7 @@ const MahjongCinema = () => {
         {
           opacity: 1,
           y: 0,
-          duration: 1,
+          duration: CONFIG.ANIMATION.CARD_CONTAINER_TRANSITION_DURATION,
           ease: "power2.out",
         },
         "-=0.5"
@@ -167,10 +213,10 @@ const MahjongCinema = () => {
             {
               opacity: 1,
               y: 0,
-              duration: 0.4,
+              duration: CONFIG.ANIMATION.CARD_APPEAR_DURATION,
               ease: "back.out(1.5)",
             },
-            `-=${i === 0 ? 0 : 0.3}` // 0.3초씩 겹치며 등장
+            `-=${i === 0 ? 0 : CONFIG.ANIMATION.CARD_APPEAR_OVERLAP}`
           );
         }
       });
@@ -265,7 +311,7 @@ const MahjongCinema = () => {
         className="absolute inset-0 flex items-center justify-center z-30 px-8"
       >
         <div className="flex gap-6 justify-center">
-          {Array(5)
+          {Array(CONFIG.CARD_COUNT)
             .fill(null)
             .map((_, index) => (
               <div
@@ -285,7 +331,7 @@ const MahjongCinema = () => {
                   style={{
                     transformStyle: "preserve-3d",
                     transform: flippedCards[index] ? "rotateY(180deg)" : "rotateY(0deg)",
-                    transition: "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+                    transition: `transform ${CONFIG.CARD_FLIP_DURATION}ms cubic-bezier(0.4, 0, 0.2, 1)`,
                   }}
                 >
                   {/* 뒷면 (초기 상태) */}
