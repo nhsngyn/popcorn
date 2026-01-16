@@ -342,7 +342,7 @@ const Scratch = () => {
       </motion.div>
 
       {/* 나가기 버튼 - 더 세련되게 */}
-      <Link to="/" className="absolute bottom-8 right-8 z-[60] group">
+      <Link to="/?skipIntro=true" className="absolute bottom-8 right-8 z-[60] group">
         <motion.div 
           className="relative overflow-hidden"
           whileHover={{ scale: 1.05 }}

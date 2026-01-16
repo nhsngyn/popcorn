@@ -386,7 +386,7 @@ const MahjongCinema = () => {
         )}
 
         {/* EXIT 버튼 (항상 표시) */}
-        <Link to="/" className="group relative">
+        <Link to="/?skipIntro=true" className="group relative">
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
