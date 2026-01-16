@@ -4,6 +4,9 @@ import { gsap } from "gsap";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
+// Components
+import IconButton from "../../components/common/IconButton";
+
 // Assets
 import casinoVideo from "../../assets/roulette/Casino.mp4";
 import tableImg from "../../assets/roulette/table.png";
@@ -334,42 +337,32 @@ const MahjongCinema = () => {
       {/* === LAYER 5: 좌측 하단 - SKIP 버튼 (인트로 중) === */}
       {!videoEnded && (
         <div className="absolute bottom-12 left-12 z-50">
-          <motion.button
-            onClick={handleSkipVideo}
-            className="group relative"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <div className="w-16 h-16 bg-gradient-to-br from-yellow-600 to-yellow-900 rounded-lg border-2 border-yellow-400 shadow-[0_0_20px_rgba(234,179,8,0.5)] group-hover:shadow-[0_0_30px_rgba(234,179,8,0.8)] flex items-center justify-center transition-all duration-300">
-              <span className="text-white text-2xl font-bold">⏭</span>
-            </div>
-            <span className="absolute -right-2 top-1/2 -translate-y-1/2 translate-x-full text-[10px] text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap tracking-wider pl-2">
-              SKIP INTRO
-            </span>
-          </motion.button>
+          <IconButton
+            onPress={handleSkipVideo}
+            variant="yellow"
+            icon={<span className="text-white text-2xl font-bold">⏭</span>}
+            label="SKIP INTRO"
+            labelPosition="right"
+            animation={{
+              initial: { opacity: 0, x: -20 },
+              animate: { opacity: 1, x: 0 },
+              transition: { delay: 0.5 },
+            }}
+          />
         </div>
       )}
 
       {/* === LAYER 6: 우측 하단 - SHUFFLE & EXIT 버튼들 === */}
       <div className="absolute bottom-12 right-12 z-50 flex flex-col gap-4">
         
-        {/* SHUFFLE 버튼 (카드 인터랙션 활성화 후) */}
+        {/* SHUFFLE 버튼 */}
         {canInteract && (
-          <motion.button
-            onClick={shuffleCards}
+          <IconButton
+            onPress={shuffleCards}
             disabled={isShuffling}
-            className="group relative"
-            whileHover={{ scale: isShuffling ? 1 : 1.05 }}
-            whileTap={{ scale: isShuffling ? 1 : 0.95 }}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 1 }}
-          >
-            <div className={`w-16 h-16 bg-gradient-to-br from-emerald-600 to-emerald-900 rounded-lg border-2 border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.5)] group-hover:shadow-[0_0_30px_rgba(16,185,129,0.8)] flex items-center justify-center transition-all duration-300 ${isShuffling ? 'opacity-50 cursor-not-allowed' : ''}`}>
-              {isShuffling ? (
+            variant="green"
+            icon={
+              isShuffling ? (
                 <span className="text-white text-2xl animate-spin">🔄</span>
               ) : (
                 <img 
@@ -377,16 +370,22 @@ const MahjongCinema = () => {
                   alt="Shuffle" 
                   className="w-10 h-10 object-contain"
                 />
-              )}
-            </div>
-            <span className="absolute -left-2 top-1/2 -translate-y-1/2 -translate-x-full text-[10px] text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap tracking-wider pr-2">
-              {isShuffling ? 'SHUFFLING...' : 'SHUFFLE'}
-            </span>
-          </motion.button>
+              )
+            }
+            label={isShuffling ? 'SHUFFLING...' : 'SHUFFLE'}
+            labelPosition="left"
+            animation={{
+              initial: { opacity: 0, x: 20 },
+              animate: { opacity: 1, x: 0 },
+              transition: { delay: 1 },
+            }}
+          />
         )}
+
 
         {/* EXIT 버튼 (항상 표시) */}
         <Link to="/?skipIntro=true" className="group relative">
+b8f3e0a02c093bbbf7e747b41970450ad98b789b:src/pages/Mahjong/MahjongCinema.jsx
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -394,16 +393,19 @@ const MahjongCinema = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: videoEnded ? 1.5 : 0.5 }}
           >
-            <div className="w-16 h-16 bg-gradient-to-br from-red-600 to-red-900 rounded-lg border-2 border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.5)] group-hover:shadow-[0_0_30px_rgba(239,68,68,0.8)] flex items-center justify-center transition-all duration-300">
-              <img 
-                src={front1Img} 
-                alt="Exit" 
-                className="w-10 h-10 object-contain"
-              />
-            </div>
-            <span className="absolute -left-2 top-1/2 -translate-y-1/2 -translate-x-full text-[10px] text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap tracking-wider pr-2">
-              EXIT
-            </span>
+            <IconButton
+              onPress={() => {}}
+              variant="red"
+              icon={
+                <img 
+                  src={front1Img} 
+                  alt="Exit" 
+                  className="w-10 h-10 object-contain"
+                />
+              }
+              label="EXIT"
+              labelPosition="left"
+            />
           </motion.div>
         </Link>
 
