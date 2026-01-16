@@ -13,7 +13,7 @@
 홍콩 누아르의 **시각적 긴장감**, 다크 판타지의 **기묘한 공포**, 레트로 팝아트의 **경쾌한 리듬감**을 각각 다른 기술적 접근 방식으로 구현했습니다. Three.js 같은 무거운 3D 라이브러리에 의존하지 않고, **React 19와 GSAP, Canvas API**를 극한으로 활용하여 가볍지만 깊이 있는 공간감을 만들어내는 데 집중했습니다.
 
 ### 🔗 배포 주소
-popcornlab.vercel.app
+(https://popcornlab.vercel.app/))
 
 ---
 
@@ -90,9 +90,13 @@ src/
 ├── assets/             # 최적화된 이미지 및 비디오 리소스
 └── styles/             # Tailwind 설정 및 글로벌 스타일
 
+```
 
+---
 
 ## 🚀 실행 방법 (Getting Started)
+
+```bash
 # 1. 저장소 클론
 git clone [https://github.com/your-username/popcorn.git](https://github.com/your-username/popcorn.git)
 
@@ -106,10 +110,20 @@ npm run dev
 npm run build
 npm run preview
 
+```
+
 ---
 
 ## 📝 License
-This project is licensed under the MIT License.
+
+This project is licensed under the [MIT](https://www.google.com/search?q=LICENSE) License.
 
 ---
 
+<p align="center">
+Made with 🍿 by <b>Web Interaction Cinema Team</b>
+</p>
+
+```
+
+```
