@@ -112,7 +112,6 @@ const DonutGame = ({ onScoreUpdate, onGameClear }) => {
           {stack.map((donut, index) => (
             <motion.div
               key={index}
-              // ✅ [수정] style transform 대신 animate 속성에 x: "-50%" 직접 지정
               initial={index === 0 
                 ? { y: 0, opacity: 1, x: "-50%" } 
                 : { y: CONFIG.ANIMATION.DONUT_DROP_Y, opacity: 0, rotate: -30, x: "-50%" }
@@ -124,7 +123,6 @@ const DonutGame = ({ onScoreUpdate, onGameClear }) => {
                 bottom: index * CONFIG.ANIMATION.DONUT_STACK_GAP, 
                 left: `calc(50% + ${donut.x}px)`, 
                 zIndex: index,
-                // transform: "translateX(-50%)"  <-- 이거 제거됨 (충돌 원인)
               }}
             >
               <img src={donut.img} alt="donut" className="select-none pointer-events-none max-w-none" style={{ width: `${CONFIG.UI.DONUT_WIDTH}px` }} />
@@ -136,7 +134,6 @@ const DonutGame = ({ onScoreUpdate, onGameClear }) => {
       {/* 2. 현재 움직이는 도넛 */}
       {gameStatus === "playing" && (
         <motion.div 
-          // ✅ [수정] 여기도 x: "-50%" 추가하여 중앙 정렬 고정
           initial={{ scale: 0, opacity: 0, x: "-50%" }}
           animate={{ scale: 1, opacity: 1, x: "-50%" }}
           transition={{ delay: 1.5, type: "spring" }}
@@ -153,7 +150,6 @@ const DonutGame = ({ onScoreUpdate, onGameClear }) => {
       {/* 3. 성공 메시지 */}
       {gameStatus === "success" && (
         <motion.div 
-          // ✅ [수정] 성공 메시지도 확실하게 x: "-50%"
           initial={{ scale: 0, rotate: -180, x: "-50%", y: "-50%" }} 
           animate={{ scale: 1, rotate: -12, x: "-50%", y: "-50%" }}
           className="absolute top-1/2 left-1/2 z-[100] pointer-events-none"
@@ -167,7 +163,6 @@ const DonutGame = ({ onScoreUpdate, onGameClear }) => {
       {/* 4. 실패 메시지 */}
       {gameStatus === "fail" && (
         <motion.div 
-          // ✅ [수정] 실패 메시지도 x: "-50%" (이전엔 translate-x-1/2 클래스 사용했으나 Motion 충돌 방지 위해 속성으로 변경)
           initial={{ scale: 0, y: -50, x: "-50%" }} 
           animate={{ scale: 1, y: 0, x: "-50%" }}
           className="absolute top-1/3 left-1/2 z-[100] pointer-events-none text-center"
