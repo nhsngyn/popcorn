@@ -1,145 +1,115 @@
-# 🎬 Web Interaction Cinema
+# 🎬 POPCORN: Web Interaction Cinema
 
-**영화적 미장센을 웹 인터랙션으로 재해석한 실험적 웹 전시**
+![Project Status](https://img.shields.io/badge/Status-Completed-success) ![Version](https://img.shields.io/badge/Version-1.0.0-blue) ![License](https://img.shields.io/badge/License-MIT-green)
 
-본 프로젝트는 영화적 미장센을 웹 인터랙션 기술로 재해석한 'Web Interaction Cinema'입니다.  
-홍콩 누아르의 시각적 긴장감, 다크 판타지의 촉각적 몰입, 레트로 팝아트의 리듬감을  
-**React와 GSAP 기반 2D 모션 인터랙션**으로 구현했습니다.
-
-3D 라이브러리에 의존하지 않고, **최적화된 2D 렌더링만으로 깊은 몰입감**을 주는 것을 기술적 목표로 삼았습니다.
+> **"웹에서 경험하는 영화적 미장센"** > 3D 라이브러리 없이, 오직 2D 인터랙션 기술만으로 구현한 시네마틱 웹 전시 프로젝트
 
 ---
 
-## 🎯 프로젝트 목적
+## 📖 프로젝트 소개
 
-3개의 서로 다른 영화적 분위기를  
-**React + GSAP 기반의 고도화된 2D 인터랙션**으로 재해석해  
-사용자에게 짧고 강렬한 체험형 웹 인터랙션을 제공합니다.
+**POPCORN**은 영화 속 상징적인 미장센(Mise-en-scène)을 웹 기술로 재해석한 실험적인 인터랙티브 웹 사이트입니다.
 
----
+홍콩 누아르의 **시각적 긴장감**, 다크 판타지의 **기묘한 공포**, 레트로 팝아트의 **경쾌한 리듬감**을 각각 다른 기술적 접근 방식으로 구현했습니다. Three.js 같은 무거운 3D 라이브러리에 의존하지 않고, **React 19와 GSAP, Canvas API**를 극한으로 활용하여 가볍지만 깊이 있는 공간감을 만들어내는 데 집중했습니다.
 
-## 🎭 3개의 인터랙션
-
-### 1. 🀄 마작 인터랙션 – 홍콩 누아르 (Night in HK)
-- **분위기**: 네온으로 젖은 뒷골목, 테이블 위 마작패의 긴장감
-- **기술**: GSAP Timeline을 활용한 시네마틱 오프닝 + 3D Transform (Flip)
-- **연출**: 인트로 영상과 이어지는 매끄러운 화면 전환, 마작패가 뒤집히며 드러나는 랜덤 심볼
-- **컬러**: 붉은/푸른 네온 반사광과 마작패의 질감
-
-### 2. 🧵 스크래치 인터랙션 – 코렐라인 다크 판타지
-- **분위기**: 1인칭 시점에서 '구멍 너머 세계'를 바라보는 긴장감
-- **기술**: Canvas API destination-out 스크래치 + 패럴랙스 효과
-- **연출**: 찢을수록 어둡고 기묘한 세계가 드러남 (70% 달성 시 완전 오픈)
-- **컬러**: 보랏빛/푸른빛의 심도 있는 음영
-
-### 3. 🍩 도넛 쌓기 – 레트로 다이너 팝아트
-- **분위기**: 80's 레트로 다이너의 경쾌한 리듬감
-- **기술**: GSAP squash/stretch + 그림자 확대 애니메이션
-- **연출**: 좌우로 움직이는 도넛을 클릭해 쌓기 (5개 성공 시 "PERFECT!")
-- **컬러**: 핫핑크, 민트그린, 레드 팝아트 스타일
+### 🔗 배포 주소
+(배포 후 링크를 여기에 입력하세요, 예: https://popcorn-cinema.vercel.app)
 
 ---
 
-## ⚙️ 기술 스택
+## 🛠 기술 스택 (Tech Stack)
 
-- **React 19** – 페이지 구조 및 상태 관리
-- **GSAP 3.13** – 모션 중심 인터랙션
-- **Framer Motion** – 선언적 애니메이션
-- **Canvas API** – 스크래치 구현
-- **React Router** – 페이지 라우팅
-- **Tailwind CSS** – 스타일링
-- **Vite** – 빌드 툴
-
----
-
-## 🎨 비주얼 & 아트 디렉션
-
-### 마작 – 홍콩 누아르
-- 붉은/푸른 네온 반사광
-- 카지노 테이블의 질감
-- 촉촉한 도시 밤 분위기
-- 왕가위 영화 스타일의 시네마틱 연출
-
-### 스크래치 – 다크 판타지
-- 코렐라인의 노이즈 텍스처
-- 공포 + 동화적 컬러 믹스
-- 보랏빛/푸른빛의 심도 있는 음영
-
-### 도넛 쌓기 – 레트로 다이너
-- 핫핑크, 민트그린, 레드
-- 네온 라이트 + 체크보드 바닥
-- 잡지 광고 같은 팝아트 스타일
+| 분류 | 기술 | 활용 목적 |
+|:---:|:---|:---|
+| **Core** | ![React](https://img.shields.io/badge/React_19-20232A?style=flat&logo=react&logoColor=61DAFB) ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white) | 최신 React 기능 활용 및 빠른 빌드 환경 구축 |
+| **Animation** | ![GSAP](https://img.shields.io/badge/GSAP_3-88CE02?style=flat&logo=greensock&logoColor=white) ![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=flat&logo=framer&logoColor=white) | 복잡한 시퀀스 제어(GSAP) 및 선언적 UI 애니메이션(Framer) |
+| **Graphic** | ![Canvas API](https://img.shields.io/badge/Canvas_API-E34F26?style=flat&logo=html5&logoColor=white) | 픽셀 단위 조작 및 스크래치 효과 구현 |
+| **Styling** | ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwindcss&logoColor=white) | 반응형 레이아웃 및 빠른 스타일링 |
+| **Deploy** | ![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat&logo=vercel&logoColor=white) | CI/CD 및 호스팅 (예정) |
 
 ---
 
-## 🚀 시작하기
+## 🎭 주요 기능 및 인터랙션 (Features)
 
-### 설치
+### 1. Night in HK (홍콩 누아르)
+> *"흔들리는 네온사인, 테이블 위 마작패의 긴장감"*
+
+* **Concept**: 왕가위 감독 영화 특유의 스텝 프린팅 기법과 몽환적인 색감 재현
+* **Tech Highlights**:
+    * `<video>` 태그의 `playbackRate`를 동적으로 조절하여 시간의 왜곡 표현
+    * **GSAP Context**를 활용한 마작패 셔플 및 3D Flip 애니메이션
+    * 상태 관리를 통한 인터랙션 단계 제어 (Intro → Shuffle → Interaction)
+
+### 2. Secret Door (다크 판타지)
+> *"문 너머의 진실을 긁어내라, Beware the witch's lies"*
+
+* **Concept**: 영화 '코렐라인'의 기괴하고 신비로운 '단추 구멍' 너머의 세계
+* **Tech Highlights**:
+    * **HTML5 Canvas API**의 `globalCompositeOperation = 'destination-out'`을 활용한 리얼타임 스크래치 구현
+    * 픽셀 데이터(`getImageData`) 샘플링 최적화로 긁어낸 면적(%) 실시간 계산
+    * 마우스/터치 좌표 보정을 통한 **커스텀 커서(바늘)** 트래킹 및 베지어 곡선 드로잉
+    * Framer Motion을 활용한 핸드 헬드(Hand-held) 느낌의 패럴랙스 줌인 연출
+
+### 3. Pop Diner (레트로 팝아트)
+> *"80년대 다이너의 경쾌한 리듬, 쌓아올리는 달콤함"*
+
+* **Concept**: 앤디 워홀 스타일의 팝아트 컬러와 미국 레트로 다이너 감성
+* **Tech Highlights**:
+    * **GSAP Physics** 느낌의 `squash & stretch` (찌그러짐) 애니메이션으로 타격감 구현
+    * 화면 크기에 반응하는 좌표 계산 로직으로 정확한 충돌 판정 및 쌓기(Stacking) 구현
+    * 오차 범위 허용(Tolerance) 알고리즘을 통한 게임 난이도 밸런싱
+
+---
+
+## ⚡️ 기술적 도전과 해결 (Troubleshooting)
+
+### 1. Canvas 성능 최적화 (Scratch)
+* **문제**: `mousemove` 이벤트마다 전체 픽셀을 검사(`getImageData`)하여 진행률을 체크하니 프레임 드랍 발생.
+* **해결**: 드로잉 중에는 캔버스에 그리기만 수행하고, **`mouseup` (드래그 종료) 시점에만 픽셀 연산을 수행**하도록 로직 분리. 픽셀 검사 시에도 전체가 아닌 `stride` 기법(64픽셀 건너뛰기)을 적용하여 연산량을 획기적으로 감소시킴.
+
+### 2. 동영상과 DOM의 이질감 제거 (Mahjong)
+* **문제**: 인트로 영상이 끝나고 인터랙티브 DOM 요소로 전환될 때 깜빡임이나 이질감 발생.
+* **해결**: 영상 종료(`onEnded`) 시점에 맞춰 **GSAP Timeline**을 실행, 배경 이미지를 영상의 마지막 프레임과 정확히 일치시키고 `opacity`와 `scale`을 미세하게 교차(Cross-fade)시켜 끊김 없는 사용자 경험 제공.
+
+### 3. 모바일 터치 대응 (Common)
+* **문제**: 모바일 환경에서 스크래치나 드래그 시 브라우저 스크롤이 같이 발생하거나 터치 딜레이 발생.
+* **해결**: CSS `touch-action: none` 적용 및 React의 `PointerEvent`를 활용하여 마우스와 터치 이벤트를 통합 처리.
+
+---
+
+## 📂 폴더 구조 (Directory Structure)
+
 ```bash
+src/
+├── pages/
+│   ├── Lobby/          # 메인 게이트 (3D 카드형 메뉴)
+│   ├── Mahjong/        # 마작 인터랙션 (Video + GSAP)
+│   ├── Scratch/        # 스크래치 인터랙션 (Canvas API)
+│   └── Donut/          # 도넛 게임 (Physics Logic)
+├── components/         # 재사용 가능한 UI 컴포넌트
+├── assets/             # 최적화된 이미지 및 비디오 리소스
+└── styles/             # Tailwind 설정 및 글로벌 스타일
+
+
+
+## 🚀 실행 방법 (Getting Started)
+# 1. 저장소 클론
+git clone [https://github.com/your-username/popcorn.git](https://github.com/your-username/popcorn.git)
+
+# 2. 의존성 설치
 npm install
-```
 
-### 개발 서버 실행
-```bash
+# 3. 개발 서버 실행
 npm run dev
-```
 
-### 빌드
-```bash
+# 4. 빌드 및 프리뷰
 npm run build
-```
-
-### 프리뷰
-```bash
 npm run preview
-```
 
 ---
 
-## 📂 프로젝트 구조
-
-```
-popcorn/
-├── src/
-│   ├── pages/
-│   │   ├── Lobby/          # 메인 로비 (3개 인터랙션 선택)
-│   │   ├── Mahjong/        # 마작 인터랙션
-│   │   ├── Scratch/        # 스크래치 인터랙션
-│   │   └── Donut/          # 도넛 쌓기 인터랙션
-│   ├── components/         # 공통 컴포넌트
-│   ├── assets/             # 이미지 에셋
-│   └── styles/             # 글로벌 스타일
-└── public/
-    └── fonts/              # 커스텀 폰트
-```
+## 📝 License
+This project is licensed under the MIT License.
 
 ---
 
-## 🧪 기술적 목표
-
-- ✅ Three.js 등 3D 라이브러리 사용 없이 **2D 애니메이션만으로 깊은 몰입감** 구현
-- ✅ 모든 인터랙션을 **60fps**에 가깝게 부드럽게 유지
-- ✅ 성능 최적화를 고려한 **Lazy Loading + Code Splitting**
-- ✅ 모바일에서도 무리 없이 동작하는 반응형 설계
-
----
-
-## 🎬 핵심 기획 의도
-
-> "웹에서 구현할 수 있는 **미장센 기반의 영화적 몰입감** 실험"
-
-3D를 쓰지 않고, **2D 이미지 + 애니메이션만으로 깊이감을 극대화**하여  
-사용자가 **'짧은 영화관 3편을 본 것 같은 경험'**을 하게 만드는 것이 목표입니다.
-
----
-
-## 📝 라이선스
-
-MIT
-
----
-
-## 👤 작성자
-
-**Web Interaction Cinema Project**  
-2025
