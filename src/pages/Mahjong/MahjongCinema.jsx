@@ -316,10 +316,10 @@ const MahjongCinema = () => {
             .map((_, index) => (
               <div
                 key={index}
-                onClick={() => handleFlipCard(index)}
+                onPointerDown={() => handleFlipCard(index)}
                 className={`relative w-[160px] h-[224px] ${
                   canInteract ? "cursor-pointer" : "cursor-default"
-                } transition-all duration-200`}
+                } transition-all duration-200 touch-none`}
                 style={{
                   perspective: "1200px",
                 }}
@@ -383,6 +383,24 @@ const MahjongCinema = () => {
       {/* === LAYER 5: 좌측 하단 - SKIP 버튼 (인트로 중) === */}
       {!videoEnded && (
         <div className="absolute bottom-12 left-12 z-50">
+<<<<<<< HEAD:src/pages/Roulette/MahjongCinema.jsx
+          <motion.button
+            onPointerDown={handleSkipVideo}
+            className="group relative touch-none"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <div className="w-16 h-16 bg-gradient-to-br from-yellow-600 to-yellow-900 rounded-lg border-2 border-yellow-400 shadow-[0_0_20px_rgba(234,179,8,0.5)] group-hover:shadow-[0_0_30px_rgba(234,179,8,0.8)] flex items-center justify-center transition-all duration-300">
+              <span className="text-white text-2xl font-bold">⏭</span>
+            </div>
+            <span className="absolute -right-2 top-1/2 -translate-y-1/2 translate-x-full text-[10px] text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap tracking-wider pl-2">
+              SKIP INTRO
+            </span>
+          </motion.button>
+=======
           <IconButton
             onPress={handleSkipVideo}
             variant="yellow"
@@ -395,6 +413,7 @@ const MahjongCinema = () => {
               transition: { delay: 0.5 },
             }}
           />
+>>>>>>> a525dd3dc406ddda2f5a3c3b0ab0c4b063b14d7d:src/pages/Mahjong/MahjongCinema.jsx
         </div>
       )}
 
@@ -403,12 +422,27 @@ const MahjongCinema = () => {
         
         {/* SHUFFLE 버튼 */}
         {canInteract && (
+<<<<<<< HEAD:src/pages/Roulette/MahjongCinema.jsx
+          <motion.button
+            onPointerDown={shuffleCards}
+            disabled={isShuffling}
+            className="group relative touch-none"
+            whileHover={{ scale: isShuffling ? 1 : 1.05 }}
+            whileTap={{ scale: isShuffling ? 1 : 0.95 }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1 }}
+          >
+            <div className={`w-16 h-16 bg-gradient-to-br from-emerald-600 to-emerald-900 rounded-lg border-2 border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.5)] group-hover:shadow-[0_0_30px_rgba(16,185,129,0.8)] flex items-center justify-center transition-all duration-300 ${isShuffling ? 'opacity-50 cursor-not-allowed' : ''}`}>
+              {isShuffling ? (
+=======
           <IconButton
             onPress={shuffleCards}
             disabled={isShuffling}
             variant="green"
             icon={
               isShuffling ? (
+>>>>>>> a525dd3dc406ddda2f5a3c3b0ab0c4b063b14d7d:src/pages/Mahjong/MahjongCinema.jsx
                 <span className="text-white text-2xl animate-spin">🔄</span>
               ) : (
                 <img 
