@@ -74,7 +74,7 @@ const Donut = () => {
                   style={{ 
                     backgroundImage: "linear-gradient(90deg, #ff6b6b 2px, transparent 2px), linear-gradient(#ff6b6b 2px, transparent 2px)",
                     backgroundSize: "60px 60px",
-                    backgroundPosition: "center top" // ✅ [수정] 패턴 중앙 정렬
+                    backgroundPosition: "center top"
                   }} />
              <div className="absolute top-0 left-20 w-40 h-full bg-white opacity-20 skew-x-12 blur-xl" />
           </div>
