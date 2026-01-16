@@ -3,9 +3,8 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import ScratchCanvas from "./ScratchCanvas";
 
-// 에셋 경로
-import candyBgImg from "../../assets/scratch/candy.png"; // 폴백용
-import candyBgVideo from "../../assets/scratch/candy.mp4"; // 비디오
+import candyBgImg from "../../assets/scratch/candy.png";
+import candyBgVideo from "../../assets/scratch/candy.mp4"; // 파일 존재 여부 확인 필요
 import handStoneImg from "../../assets/scratch/handstone.png";
 import moonImg from "../../assets/scratch/moon.png";
 import tunnelImg from "../../assets/scratch/tunnel.png";
@@ -15,8 +14,8 @@ const Scratch = () => {
   const [isZoomed, setIsZoomed] = useState(false);
   const [canScratch, setCanScratch] = useState(false);
   const [showGlitch, setShowGlitch] = useState(false);
-  const [useVideo, setUseVideo] = useState(true); // 비디오 사용 여부
-  const [videoLoaded, setVideoLoaded] = useState(false); // 비디오 로드 완료
+  const [useVideo, setUseVideo] = useState(true);
+  const [videoLoaded, setVideoLoaded] = useState(false);
   const videoRef = useRef(null);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
@@ -24,16 +23,13 @@ const Scratch = () => {
   });
 
   useEffect(() => {
-    // 모바일 감지 (768px 이하는 이미지 사용)
     const isMobile = window.innerWidth < 768;
     setUseVideo(!isMobile);
 
-    // 3초 뒤 줌인 시작 (1초 → 3초로 변경, 강아지 더 오래 보기)
     const zoomTimer = setTimeout(() => {
       setIsZoomed(true);
     }, 3000);
 
-    // 5.5초 뒤 스크래치 활성화 (3.5초 → 5.5초, 줌인 시간 증가에 맞춤)
     const scratchTimer = setTimeout(() => {
       setCanScratch(true);
     }, 5500);
@@ -49,17 +45,15 @@ const Scratch = () => {
     };
   }, []);
 
-  // 비디오 자동 재생
   useEffect(() => {
     if (videoRef.current && useVideo) {
       videoRef.current.play().catch(err => {
         console.log("Video autoplay failed:", err);
-        setUseVideo(false); // 자동재생 실패 시 이미지로 폴백
+        setUseVideo(false);
       });
     }
   }, [useVideo]);
 
-  // 드러났을 때 글리치 효과
   useEffect(() => {
     if (isRevealed) {
       setShowGlitch(true);
@@ -79,11 +73,9 @@ const Scratch = () => {
   return (
     <div className="w-full h-screen bg-black overflow-hidden flex items-center justify-center relative select-none">
       
-      {/* 비네팅 효과 (가장자리 어둡게) - 더 강하게 */}
       <div className="absolute inset-0 z-50 pointer-events-none" 
            style={{ background: "radial-gradient(circle at center, transparent 20%, rgba(0,0,0,0.7) 60%, black 100%)" }} />
       
-      {/* 노이즈 오버레이 (필름 그레인 효과) */}
       <div 
         className="absolute inset-0 z-[49] pointer-events-none opacity-[0.03] mix-blend-overlay"
         style={{
@@ -92,9 +84,7 @@ const Scratch = () => {
         }}
       />
 
-{/* =================================================================
-          LAYER 0: 진짜 세상 (터널)
-      ================================================================= */}
+      {/* 진짜 세상 (터널) */}
       <motion.div 
         className="absolute inset-0 z-0"
         initial={{ opacity: 0 }}   
@@ -114,11 +104,9 @@ const Scratch = () => {
           transition={{ duration: 2, ease: "easeInOut" }}
         />
         
-        {/* 개선된 성공 연출 - 미니멀하고 불안한 느낌 */}
         <AnimatePresence>
           {isRevealed && (
             <>
-              {/* 어두운 오버레이 */}
               <motion.div 
                 initial={{ opacity: 0 }} 
                 animate={{ opacity: 1 }} 
@@ -127,7 +115,6 @@ const Scratch = () => {
                 className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 z-40"
               />
 
-              {/* 글리치 효과 */}
               {showGlitch && (
                 <motion.div
                   className="absolute inset-0 z-[45] pointer-events-none"
@@ -146,7 +133,6 @@ const Scratch = () => {
                 />
               )}
 
-              {/* 중앙 텍스트 - 세련되고 불안한 느낌 */}
               <motion.div 
                 initial={{ opacity: 0, y: 20 }} 
                 animate={{ opacity: 1, y: 0 }} 
@@ -154,7 +140,6 @@ const Scratch = () => {
                 transition={{ duration: 1.5, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 className="absolute inset-0 flex flex-col items-center justify-center z-50 text-center"
               >
-                {/* 메인 텍스트 */}
                 <motion.div
                   className="relative"
                   animate={showGlitch ? {
@@ -173,7 +158,6 @@ const Scratch = () => {
                     BEYOND
                   </h1>
                   
-                  {/* 서브 텍스트 */}
                   <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 0.6 }}
@@ -185,7 +169,6 @@ const Scratch = () => {
                   </motion.p>
                 </motion.div>
 
-                {/* 장식 라인 */}
                 <motion.div
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
@@ -194,7 +177,6 @@ const Scratch = () => {
                 />
               </motion.div>
 
-              {/* 주변 파티클 효과 (먼지/별) */}
               {[...Array(15)].map((_, i) => (
                 <motion.div
                   key={i}
@@ -222,9 +204,7 @@ const Scratch = () => {
         </AnimatePresence>
       </motion.div>
 
-      {/* =================================================================
-          LAYER 1: 초기 배경 (사탕 테이블) - 비디오 또는 이미지
-      ================================================================= */}
+      {/* 초기 배경 (사탕 테이블) */}
       <motion.div 
         className="absolute inset-0 z-10"
         animate={{ opacity: isZoomed ? 0 : 1, scale: isZoomed ? 1.5 : 1 }}
@@ -232,7 +212,6 @@ const Scratch = () => {
       >
         {useVideo ? (
           <>
-            {/* 비디오 배경 */}
             <video
               ref={videoRef}
               className="w-full h-full object-cover"
@@ -241,7 +220,7 @@ const Scratch = () => {
               playsInline
               preload="auto"
               onLoadedData={() => setVideoLoaded(true)}
-              onError={() => setUseVideo(false)} // 에러 시 이미지로 폴백
+              onError={() => setUseVideo(false)}
               style={{ 
                 opacity: videoLoaded ? 1 : 0,
                 transition: 'opacity 0.5s ease-in-out'
@@ -250,7 +229,6 @@ const Scratch = () => {
               <source src={candyBgVideo} type="video/mp4" />
             </video>
             
-            {/* 비디오 로딩 중 플레이스홀더 */}
             {!videoLoaded && (
               <img 
                 src={candyBgImg} 
@@ -260,7 +238,6 @@ const Scratch = () => {
             )}
           </>
         ) : (
-          /* 이미지 폴백 (모바일 또는 비디오 실패 시) */
           <img 
             src={candyBgImg} 
             alt="Candy Background" 
@@ -268,7 +245,6 @@ const Scratch = () => {
           />
         )}
         
-        {/* 워터마크 가리기 - 우측 상단 어둡게 */}
         <div 
           className="absolute top-0 right-0 w-1/3 h-1/4 pointer-events-none z-10"
           style={{
@@ -277,16 +253,13 @@ const Scratch = () => {
         />
       </motion.div>
 
-      {/* =================================================================
-          LAYER 2: 가짜 세상 (달 캔버스)
-      ================================================================= */}
+      {/* 가짜 세상 (달 캔버스) */}
       <motion.div 
         className={`absolute inset-0 z-20 ${canScratch ? 'pointer-events-auto' : 'pointer-events-none'}`}
         initial={{ opacity: 0 }}
         animate={{ opacity: isZoomed ? 1 : 0 }} 
-        transition={{ duration: 1.0, delay: 1.5 }} // 손이 자리를 잡을 때쯤 나타남
+        transition={{ duration: 1.0, delay: 1.5 }}
       >
-         {/* 스크래치 가능 상태일 때만 캔버스 활성화 */}
          <ScratchCanvas 
             width={windowSize.width} 
             height={windowSize.height} 
@@ -295,7 +268,6 @@ const Scratch = () => {
             isActive={canScratch}
          />
          
-         {/* 스크래치 가능 힌트 (처음 활성화될 때만 표시) */}
          {canScratch && !isRevealed && (
            <motion.div
              initial={{ opacity: 0 }}
@@ -309,16 +281,10 @@ const Scratch = () => {
          )}
       </motion.div>
 
-      {/* =================================================================
-          LAYER 3: [손 프레임] - 사라지지 않고 프레임으로 남음!
-      ================================================================= */}
+      {/* 손 프레임 */}
       <motion.div 
         className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none overflow-hidden"
-        
-        // 1. 초기 위치: 오른쪽 아래, 약간 기울어짐 (자연스럽게)
         initial={{ x: "30%", y: "10%", scale: 0.8, rotate: 15 }}
-
-        // 2. 줌인 후: 중앙 정렬, 적당한 확대, 회전 0 (정자세)
         animate={isZoomed ? { 
           x: 400, 
           y: 0, 
@@ -327,10 +293,8 @@ const Scratch = () => {
         } : { 
           x: "30%", y: "40%", scale: 0.7, rotate: 5 
         }}
-
         transition={{ 
           duration: 2.5, 
-          // 👇 [핵심] 베지어 곡선: 천천히 출발 -> 빠르게 이동 -> 부드럽게 감속 (S자 곡선)
           ease: [0.7, 0, 0.3, 1]
         }}
       >
@@ -341,7 +305,6 @@ const Scratch = () => {
          />
       </motion.div>
 
-      {/* 나가기 버튼 - 더 세련되게 */}
       <Link to="/?skipIntro=true" className="absolute bottom-8 right-8 z-[60] group">
         <motion.div 
           className="relative overflow-hidden"
@@ -351,7 +314,6 @@ const Scratch = () => {
           <div className="text-white/50 border border-white/20 px-6 py-3 backdrop-blur-md bg-black/20 hover:bg-white/10 hover:border-white/40 hover:text-white/80 transition-all duration-300 tracking-[0.3em] text-xs font-light">
             EXIT
           </div>
-          {/* 호버 시 빛나는 효과 */}
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
             initial={{ x: '-100%' }}
