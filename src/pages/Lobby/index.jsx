@@ -2,89 +2,181 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import IntroOverlay from "./IntroOverlay";
+import lobbyBg from "../../assets/lobby/Lobby.png";
 
 const Lobby = () => {
-  const [showIntro, setShowIntro] = useState(true); // 처음엔 인트로 보여주기
+  const [hoveredCard, setHoveredCard] = useState(null);
+
+  const shows = [
+    {
+      id: 1,
+      path: "/mahjong",
+      title: "Night in HK",
+      subtitle: "Interactive Tiles",
+      icon: "🀄",
+      color: "red",
+      spotlightColor: "rgba(220, 38, 38, 0.6)", // red-600
+    },
+    {
+      id: 2,
+      path: "/scratch",
+      title: "Secret Door",
+      subtitle: "Scratch",
+      icon: "🧵",
+      color: "blue",
+      spotlightColor: "rgba(37, 99, 235, 0.6)", // blue-600
+    },
+    {
+      id: 3,
+      path: "/donut",
+      title: "Pop Diner",
+      subtitle: "Stacking",
+      icon: "🍩",
+      color: "yellow",
+      spotlightColor: "rgba(234, 179, 8, 0.6)", // yellow-600
+    },
+  ];
 
   return (
-    <div className="relative w-full h-screen bg-neutral-900 text-white overflow-hidden font-sans">
+    <div className="relative w-full h-screen overflow-hidden font-sans">
       
-      {/* 1. 인트로 (끝나면 사라짐) */}
-      {showIntro && (
-        <IntroOverlay onComplete={() => setShowIntro(false)} />
+      {/* 배경 이미지 */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${lobbyBg})` }}
+      >
+        {/* 어두운 오버레이 (카드가 더 잘 보이도록) */}
+        <div className="absolute inset-0 bg-black/30" />
+      </div>
+
+      {/* 스포트라이트 효과 (호버 시) */}
+      {hoveredCard !== null && (
+        <motion.div
+          className="absolute pointer-events-none z-10"
+          style={{
+            top: "20%",
+            left: `${30 + hoveredCard * 20}%`,
+            width: "400px",
+            height: "400px",
+            background: `radial-gradient(circle, ${shows[hoveredCard].spotlightColor} 0%, transparent 70%)`,
+            filter: "blur(40px)",
+            transform: "translateX(-50%)",
+          }}
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.4 }}
+        />
       )}
 
-      {/* 2. 메인 로비 UI (인트로 끝나면 서서히 등장) */}
-      {!showIntro && (
-        <motion.div 
-          className="w-full h-full flex flex-col items-center justify-center"
+      {/* 메인 컨텐츠 */}
+      <div className="relative w-full h-full flex flex-col items-center justify-center z-10">
+        
+        {/* 극장 타이틀 */}
+        <motion.div
+          className="text-center mb-20"
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1, delay: 0.5 }}
+        >
+          <h1 className="text-7xl font-black text-amber-100 tracking-[0.3em] mb-2 drop-shadow-[0_0_30px_rgba(251,191,36,0.5)]"
+              style={{ 
+                textShadow: "0 0 20px rgba(251,191,36,0.8), 0 0 40px rgba(251,191,36,0.4)",
+                fontFamily: "serif"
+              }}>
+            POPCORN
+          </h1>
+          <p className="text-amber-200/60 tracking-[0.8em] text-sm uppercase">Cinema</p>
+        </motion.div>
+
+        {/* 상영작 카드들 */}
+        <div className="flex gap-16 items-end justify-center">
+          {shows.map((show, index) => (
+            <Link
+              key={show.id}
+              to={show.path}
+              onMouseEnter={() => setHoveredCard(index)}
+              onMouseLeave={() => setHoveredCard(null)}
+            >
+              <motion.div
+                className="relative group cursor-pointer"
+                initial={{ y: 100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.8 + index * 0.2 }}
+                whileHover={{ y: -30, scale: 1.05 }}
+              >
+                {/* 카드 본체 */}
+                <div className={`
+                  relative w-56 h-80 bg-gradient-to-b from-neutral-800 to-neutral-900
+                  border-2 ${
+                    hoveredCard === index 
+                      ? `border-${show.color}-500 shadow-[0_0_40px_rgba(${show.color === 'red' ? '220,38,38' : show.color === 'blue' ? '37,99,235' : '234,179,8'},0.6)]`
+                      : 'border-neutral-700'
+                  }
+                  rounded-lg overflow-hidden
+                  transition-all duration-500
+                `}>
+                  
+                  {/* 스포트라이트 받는 효과 */}
+                  <div className={`
+                    absolute inset-0 
+                    ${hoveredCard === index ? 'opacity-100' : 'opacity-0'}
+                    bg-gradient-to-b from-white/10 to-transparent
+                    transition-opacity duration-500
+                  `} />
+
+                  {/* 콘텐츠 */}
+                  <div className="relative w-full h-full flex flex-col items-center justify-center p-6 z-10">
+                    <motion.span 
+                      className="text-7xl mb-6"
+                      animate={hoveredCard === index ? { scale: [1, 1.1, 1] } : {}}
+                      transition={{ duration: 0.6, repeat: Infinity }}
+                    >
+                      {show.icon}
+                    </motion.span>
+                    <h3 className={`
+                      text-2xl font-bold text-center mb-2
+                      ${hoveredCard === index ? `text-${show.color}-400` : 'text-neutral-300'}
+                      transition-colors duration-300
+                    `}>
+                      {show.title}
+                    </h3>
+                    <p className="text-xs text-neutral-500 uppercase tracking-widest">
+                      {show.subtitle}
+                    </p>
+
+                    {/* 티켓 스타일 장식 */}
+                    <div className="absolute top-4 right-4 w-8 h-8 border-2 border-neutral-600 rounded-full opacity-30" />
+                    <div className="absolute bottom-4 left-4 w-8 h-8 border-2 border-neutral-600 rounded-full opacity-30" />
+                  </div>
+
+                  {/* 하단 그림자 */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" />
+                </div>
+
+                {/* 카드 아래 그림자 */}
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4/5 h-4 bg-black/40 blur-xl rounded-full" />
+              </motion.div>
+            </Link>
+          ))}
+        </div>
+
+        {/* 하단 안내 문구 */}
+        <motion.p
+          className="absolute bottom-12 text-neutral-600 text-sm tracking-wider"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1.5 }} // 천천히 밝아짐
+          transition={{ duration: 1, delay: 2 }}
         >
-          {/* 타이틀 영역 */}
-          <div className="text-center mb-16 z-10">
-            <h1 className="text-6xl font-black text-white tracking-widest mb-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
-              CINEMA
-            </h1>
-            <p className="text-neutral-500 tracking-[0.6em] text-sm uppercase">Interaction Archive</p>
-          </div>
+          Select your experience
+        </motion.p>
+      </div>
 
-          {/* 상영작 선택 카드 (추후 3D로 교체 가능) */}
-          <div className="flex gap-10 items-center justify-center perspective-1000">
-            
-            {/* 1. 마작 (홍콩) */}
-            <Link to="/roulette">
-              <motion.div 
-                whileHover={{ y: -20, scale: 1.05 }}
-                className="group relative w-60 h-80 bg-black rounded-xl border border-neutral-800 cursor-pointer overflow-hidden shadow-2xl"
-              >
-                {/* 배경 그라데이션 */}
-                <div className="absolute inset-0 bg-gradient-to-t from-red-900/50 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500"/>
-                
-                {/* 아이콘/콘텐츠 */}
-                <div className="w-full h-full flex flex-col items-center justify-center relative z-10">
-                  <span className="text-6xl mb-4 group-hover:blur-[2px] transition-all duration-300">🀄</span>
-                  <h3 className="text-2xl font-bold text-neutral-300 group-hover:text-red-500 transition-colors">Night in HK</h3>
-                  <p className="text-xs text-neutral-500 mt-2 uppercase tracking-wider">Interactive Tiles</p>
-                </div>
-              </motion.div>
-            </Link>
-
-            {/* 2. 스크래치 (코렐라인) */}
-            <Link to="/scratch">
-              <motion.div 
-                whileHover={{ y: -20, scale: 1.05 }}
-                className="group relative w-60 h-80 bg-black rounded-xl border border-neutral-800 cursor-pointer overflow-hidden shadow-2xl"
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/50 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500"/>
-                <div className="w-full h-full flex flex-col items-center justify-center relative z-10">
-                  <span className="text-6xl mb-4 group-hover:blur-[2px] transition-all duration-300">🧵</span>
-                  <h3 className="text-2xl font-bold text-neutral-300 group-hover:text-blue-500 transition-colors">Secret Door</h3>
-                  <p className="text-xs text-neutral-500 mt-2 uppercase tracking-wider">Scratch</p>
-                </div>
-              </motion.div>
-            </Link>
-
-            {/* 3. 도넛 (팝아트) */}
-            <Link to="/donut">
-              <motion.div 
-                whileHover={{ y: -20, scale: 1.05 }}
-                className="group relative w-60 h-80 bg-black rounded-xl border border-neutral-800 cursor-pointer overflow-hidden shadow-2xl"
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-yellow-900/50 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500"/>
-                <div className="w-full h-full flex flex-col items-center justify-center relative z-10">
-                  <span className="text-6xl mb-4 group-hover:blur-[2px] transition-all duration-300">🍩</span>
-                  <h3 className="text-2xl font-bold text-neutral-300 group-hover:text-yellow-500 transition-colors">Pop Diner</h3>
-                  <p className="text-xs text-neutral-500 mt-2 uppercase tracking-wider">Stacking</p>
-                </div>
-              </motion.div>
-            </Link>
-
-          </div>
-        </motion.div>
-      )}
+      {/* 빈티지 필름 그레인 효과 */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-30"
+           style={{
+             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E")`,
+           }} />
     </div>
   );
 };
