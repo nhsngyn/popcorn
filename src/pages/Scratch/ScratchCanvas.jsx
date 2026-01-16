@@ -7,6 +7,7 @@ const ScratchCanvas = ({ width, height, coverImage, onReveal, isActive = false }
   const isDrawing = useRef(false);
   const [isReady, setIsReady] = useState(false);
   const brushImgRef = useRef(null); 
+  const lastPos = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -72,23 +73,21 @@ const ScratchCanvas = ({ width, height, coverImage, onReveal, isActive = false }
   };
 
   const startDrawing = (e) => {
-    if (!isActive) return; // 활성화되지 않았으면 무시
+    if (!isActive) return;
     isDrawing.current = true;
-    lastPos.current = { x: 0, y: 0 }; // 리셋
+    lastPos.current = null;
     draw(e);
   };
 
   const stopDrawing = () => {
-    if (!isActive) return; // 활성화되지 않았으면 무시
+    if (!isActive) return;
     isDrawing.current = false;
-    lastPos.current = { x: 0, y: 0 }; // 리셋
+    lastPos.current = null;
     checkRevealPercentage();
   };
 
-  const lastPos = useRef({ x: 0, y: 0 });
-
   const draw = (e) => {
-    if (!isDrawing.current || !isReady || !isActive) return; // isActive 체크 추가
+    if (!isDrawing.current || !isReady || !isActive) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -99,12 +98,11 @@ const ScratchCanvas = ({ width, height, coverImage, onReveal, isActive = false }
     const x = clientX - rect.left;
     const y = clientY - rect.top;
 
-    // 부드러운 선 그리기 (이전 위치에서 현재 위치까지)
-    if (lastPos.current.x !== 0 && lastPos.current.y !== 0) {
+    if (lastPos.current) {
       const dx = x - lastPos.current.x;
       const dy = y - lastPos.current.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      const steps = Math.max(1, Math.floor(distance / 5)); // 5픽셀마다 브러시 찍기
+      const steps = Math.max(1, Math.floor(distance / 5));
 
       for (let i = 0; i <= steps; i++) {
         const t = i / steps;
@@ -117,7 +115,7 @@ const ScratchCanvas = ({ width, height, coverImage, onReveal, isActive = false }
           ctx.save();
           ctx.translate(interpX, interpY);
           ctx.rotate(Math.random() * Math.PI * 2); 
-          ctx.globalAlpha = 0.8; // 약간 투명하게 (더 자연스러운 효과)
+          ctx.globalAlpha = 0.8; 
           ctx.drawImage(
               brushImgRef.current, 
               -brushSize / 2, 
