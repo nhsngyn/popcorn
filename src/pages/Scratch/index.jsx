@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ScratchCanvas from "./ScratchCanvas";
 
 import candyBgImg from "../../assets/scratch/candy.png";
-import candyBgVideo from "../../assets/scratch/candy.mp4"; // 파일 존재 여부 확인 필요
+import candyBgVideo from "../../assets/scratch/candy.mp4";
 import handStoneImg from "../../assets/scratch/handstone.png";
 import moonImg from "../../assets/scratch/moon.png";
 import tunnelImg from "../../assets/scratch/tunnel.png";
@@ -32,7 +32,7 @@ const Scratch = () => {
 
     const scratchTimer = setTimeout(() => {
       setCanScratch(true);
-    }, 5500);
+    }, 6000);
 
     const handleResize = () => {
       setWindowSize({ width: window.innerWidth, height: window.innerHeight });
@@ -84,7 +84,6 @@ const Scratch = () => {
         }}
       />
 
-      {/* 진짜 세상 (터널) */}
       <motion.div 
         className="absolute inset-0 z-0"
         initial={{ opacity: 0 }}   
@@ -148,24 +147,24 @@ const Scratch = () => {
                   } : {}}
                 >
                   <h1 
-                    className="text-7xl md:text-8xl font-light tracking-[0.3em] text-white/90 mb-6"
+                    className="text-5xl md:text-8xl font-light tracking-[0.3em] text-white/90 mb-6"
                     style={{ 
                       fontFamily: "'Helvetica Neue', 'Arial', sans-serif",
                       textShadow: '0 0 40px rgba(255,255,255,0.3), 0 0 80px rgba(100,100,255,0.2)',
                       letterSpacing: '0.3em'
                     }}
                   >
-                    BEYOND
+                    Beware
                   </h1>
                   
                   <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 0.6 }}
                     transition={{ delay: 1.5, duration: 2 }}
-                    className="text-sm tracking-[0.8em] text-white/50 uppercase"
+                    className="text-4xl tracking-[0.8em] text-white/50 uppercase"
                     style={{ fontFamily: 'monospace' }}
                   >
-                    the door
+                  the witch's lies
                   </motion.p>
                 </motion.div>
 
@@ -204,11 +203,13 @@ const Scratch = () => {
         </AnimatePresence>
       </motion.div>
 
-      {/* 초기 배경 (사탕 테이블) */}
       <motion.div 
         className="absolute inset-0 z-10"
         animate={{ opacity: isZoomed ? 0 : 1, scale: isZoomed ? 1.5 : 1 }}
-        transition={{ duration: 2.0, ease: "easeInOut" }}
+        transition={{ 
+          scale: { duration: 2.5, ease: [0.7, 0, 0.3, 1] }, 
+          opacity: { duration: 1.0, delay: 2.5 } 
+        }}
       >
         {useVideo ? (
           <>
@@ -253,12 +254,11 @@ const Scratch = () => {
         />
       </motion.div>
 
-      {/* 가짜 세상 (달 캔버스) */}
       <motion.div 
         className={`absolute inset-0 z-20 ${canScratch ? 'pointer-events-auto' : 'pointer-events-none'}`}
         initial={{ opacity: 0 }}
         animate={{ opacity: isZoomed ? 1 : 0 }} 
-        transition={{ duration: 1.0, delay: 1.5 }}
+        transition={{ duration: 1.0, delay: 2.5 }} 
       >
          <ScratchCanvas 
             width={windowSize.width} 
@@ -281,7 +281,6 @@ const Scratch = () => {
          )}
       </motion.div>
 
-      {/* 손 프레임 */}
       <motion.div 
         className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none overflow-hidden"
         initial={{ x: "30%", y: "10%", scale: 0.8, rotate: 15 }}
