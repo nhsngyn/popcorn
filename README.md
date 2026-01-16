@@ -121,9 +121,5 @@ This project is licensed under the [MIT](https://www.google.com/search?q=LICENSE
 ---
 
 <p align="center">
-Made with 🍿 by <b>Web Interaction Cinema Team</b>
+Made with 🍿 by <b>Noh Sung Yeon</b>
 </p>
-
-```
-
-```
