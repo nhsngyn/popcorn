@@ -2,88 +2,103 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const DONUT_COLORS = ["#ff9ff3", "#feca57", "#ff6b6b", "#48dbfb", "#1dd1a1"];
+// ============================================
+// 상수 정의 (Magic Numbers 제거)
+// ============================================
+const CONFIG = {
+  // 도넛 색상
+  COLORS: ["#ff9ff3", "#feca57", "#ff6b6b", "#48dbfb", "#1dd1a1"],
+  
+  // 게임 설정
+  GAME: {
+    TARGET_STACK: 5,           // 목표 도넛 개수
+    INITIAL_SPEED: 3,          // 초기 속도
+    SPEED_INCREMENT: 1.0,      // 레벨업 시 속도 증가량
+    BOUNDARY_X: 150,           // 좌우 이동 범위 (px)
+  },
+  
+  // 애니메이션 설정
+  ANIMATION: {
+    DONUT_DROP_Y: -300,        // 도넛 떨어지는 초기 위치
+    DONUT_STACK_GAP: 35,       // 쌓인 도넛 간격 (px)
+    SPRING_STIFFNESS: 400,
+    SPRING_DAMPING: 20,
+  },
+  
+  // UI 크기
+  UI: {
+    DONUT_WIDTH: 128,          // w-32 = 128px
+    DONUT_HEIGHT: 48,          // h-12 = 48px
+    CONTAINER_HEIGHT: 400,     // 게임 영역 높이
+  },
+};
 
 const DonutGame = ({ onScoreUpdate, onGameClear }) => {
   const [stack, setStack] = useState([]); 
-  // 화면 렌더링용 state
   const [renderX, setRenderX] = useState(0); 
   const [gameStatus, setGameStatus] = useState("playing"); 
 
-  // ★ 핵심: 애니메이션 연산용 Ref (리렌더링 없이 즉시 값 변경)
-  // State 대신 이걸 써야 애니메이션이 끊기지 않습니다.
   const xRef = useRef(0);
-  const directionRef = useRef(1); // 1: 오른쪽, -1: 왼쪽
-  const speedRef = useRef(3);
+  const directionRef = useRef(1);
+  const speedRef = useRef(CONFIG.GAME.INITIAL_SPEED);
   const animationRef = useRef();
-  const isPlayingRef = useRef(true); // 게임 진행 여부도 Ref로 관리
+  const isPlayingRef = useRef(true);
 
-  // 1. 게임 루프 (물리 엔진)
+  // 게임 루프
   const gameLoop = () => {
     if (!isPlayingRef.current) return;
 
-    // A. 위치 이동
     xRef.current += speedRef.current * directionRef.current;
 
-    // B. 벽 충돌 감지 (좌우 150px)
-    if (xRef.current > 150) {
-      xRef.current = 150;
-      directionRef.current = -1; // 방향 전환
-    } else if (xRef.current < -150) {
-      xRef.current = -150;
+    if (xRef.current > CONFIG.GAME.BOUNDARY_X) {
+      xRef.current = CONFIG.GAME.BOUNDARY_X;
+      directionRef.current = -1;
+    } else if (xRef.current < -CONFIG.GAME.BOUNDARY_X) {
+      xRef.current = -CONFIG.GAME.BOUNDARY_X;
       directionRef.current = 1;
     }
 
-    // C. 화면 업데이트 (React에게 그리기 요청)
     setRenderX(xRef.current);
-
-    // D. 다음 프레임 예약
     animationRef.current = requestAnimationFrame(gameLoop);
   };
 
   useEffect(() => {
-    // 게임 시작 시 루프 실행
     if (gameStatus === "playing") {
       isPlayingRef.current = true;
       animationRef.current = requestAnimationFrame(gameLoop);
     }
-    // 청소 (컴포넌트 사라질 때)
     return () => cancelAnimationFrame(animationRef.current);
   }, [gameStatus]);
 
-  // 2. 도넛 떨어뜨리기 (클릭 핸들러)
+  // 도넛 떨어뜨리기
   const handleDrop = () => {
     if (gameStatus !== "playing") return;
 
-    // 현재 위치 확정
     const currentDropX = xRef.current;
     
-    // A. 스택 추가
     const newDonut = { 
       x: currentDropX, 
-      color: DONUT_COLORS[stack.length % DONUT_COLORS.length] 
+      color: CONFIG.COLORS[stack.length % CONFIG.COLORS.length] 
     };
     const newStack = [...stack, newDonut];
     setStack(newStack);
     onScoreUpdate(newStack.length);
 
-    // B. 성공 체크 (5개 쌓으면 끝)
-    if (newStack.length >= 5) {
-      isPlayingRef.current = false; // 루프 정지
+    if (newStack.length >= CONFIG.GAME.TARGET_STACK) {
+      isPlayingRef.current = false;
       setGameStatus("success");
       onGameClear();
       cancelAnimationFrame(animationRef.current);
     } else {
-      // 난이도 상승: 속도 빨라짐
-      speedRef.current += 1.0; 
-      // 위치 초기화 없이 계속 진행 (연속성)
+      speedRef.current += CONFIG.GAME.SPEED_INCREMENT;
     }
   };
 
   return (
     <div 
-      className="relative w-full h-[400px] flex flex-col justify-end items-center cursor-pointer touch-none" 
-      onPointerDown={handleDrop} // 모바일 터치 대응을 위해 onPointerDown 사용
+      className="relative w-full flex flex-col justify-end items-center cursor-pointer touch-none" 
+      style={{ height: `${CONFIG.UI.CONTAINER_HEIGHT}px` }}
+      onPointerDown={handleDrop}
     >
       
       {/* 1. 쌓인 도넛들 */}
@@ -92,19 +107,28 @@ const DonutGame = ({ onScoreUpdate, onGameClear }) => {
           {stack.map((donut, index) => (
             <motion.div
               key={index}
-              initial={{ y: -300, opacity: 0 }} 
+              initial={{ y: CONFIG.ANIMATION.DONUT_DROP_Y, opacity: 0 }} 
               animate={{ y: 0, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              transition={{ 
+                type: "spring", 
+                stiffness: CONFIG.ANIMATION.SPRING_STIFFNESS, 
+                damping: CONFIG.ANIMATION.SPRING_DAMPING 
+              }}
               className="absolute"
               style={{
-                bottom: index * 35, 
+                bottom: index * CONFIG.ANIMATION.DONUT_STACK_GAP, 
                 left: `calc(50% + ${donut.x}px)`, 
                 zIndex: index,
               }}
             >
               <div 
-                className="w-32 h-12 rounded-[50%] border-4 border-black shadow-[0_5px_0_rgba(0,0,0,0.2)]"
-                style={{ backgroundColor: donut.color, transform: "translateX(-50%)" }}
+                className="rounded-[50%] border-4 border-black shadow-[0_5px_0_rgba(0,0,0,0.2)]"
+                style={{ 
+                  backgroundColor: donut.color, 
+                  transform: "translateX(-50%)",
+                  width: `${CONFIG.UI.DONUT_WIDTH}px`,
+                  height: `${CONFIG.UI.DONUT_HEIGHT}px`,
+                }}
               >
                 <div className="absolute top-1 left-1/2 -translate-x-1/2 w-12 h-6 bg-black/10 rounded-[50%]" />
                 <div className="absolute top-0 right-4 w-2 h-2 bg-white rounded-full opacity-50" />
@@ -114,18 +138,22 @@ const DonutGame = ({ onScoreUpdate, onGameClear }) => {
         </AnimatePresence>
       </div>
 
-      {/* 2. 현재 움직이는 도넛 (성공하면 사라짐) */}
+      {/* 2. 현재 움직이는 도넛 */}
       {gameStatus === "playing" && (
         <div 
-          className="absolute top-10 will-change-transform" // 성능 최적화 힌트
+          className="absolute top-10 will-change-transform"
           style={{ 
-            left: `calc(50% + ${renderX}px)`, // Ref 대신 State 사용 (화면 갱신용)
+            left: `calc(50% + ${renderX}px)`,
             transform: "translateX(-50%)"
           }}
         >
            <div 
-              className="w-32 h-12 rounded-[50%] border-4 border-black shadow-xl"
-              style={{ backgroundColor: DONUT_COLORS[stack.length % DONUT_COLORS.length] }}
+              className="rounded-[50%] border-4 border-black shadow-xl"
+              style={{ 
+                backgroundColor: CONFIG.COLORS[stack.length % CONFIG.COLORS.length],
+                width: `${CONFIG.UI.DONUT_WIDTH}px`,
+                height: `${CONFIG.UI.DONUT_HEIGHT}px`,
+              }}
             >
               <div className="absolute top-1 left-1/2 -translate-x-1/2 w-12 h-6 bg-black/10 rounded-[50%]" />
            </div>

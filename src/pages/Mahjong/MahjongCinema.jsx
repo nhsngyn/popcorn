@@ -1,8 +1,11 @@
-// src/pages/Roulette/MahjongCinema.jsx
+// src/pages/Mahjong/MahjongCinema.jsx
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+
+// Components
+import IconButton from "../../components/common/IconButton";
 
 // Assets
 import casinoVideo from "../../assets/roulette/Casino.mp4";
@@ -13,6 +16,37 @@ import front3Img from "../../assets/roulette/front3.png";
 import front4Img from "../../assets/roulette/front4.png";
 import backImg from "../../assets/roulette/back.png";
 
+// ============================================
+// 상수 정의 (Magic Numbers 제거)
+// ============================================
+const CONFIG = {
+  // 카드 설정
+  CARD_COUNT: 5,
+  CARD_FLIP_DURATION: 600, // ms
+  CARD_FLIP_BUFFER: 200, // ms (애니메이션 완료 여유 시간)
+  
+  // 비디오 속도 설정
+  VIDEO_SPEED: {
+    INTRO: 1.5,    // 초반 30%
+    MIDDLE: 1.2,   // 중간 30-70%
+    OUTRO: 1.5,    // 마무리 70-100%
+  },
+  VIDEO_SPEED_BREAKPOINTS: {
+    INTRO_END: 0.3,
+    MIDDLE_END: 0.7,
+  },
+  
+  // GSAP 애니메이션 설정
+  ANIMATION: {
+    TABLE_SCALE_INITIAL: 1.3,
+    TABLE_SCALE_FINAL: 1.0,
+    TABLE_TRANSITION_DURATION: 2, // seconds
+    CARD_CONTAINER_TRANSITION_DURATION: 1, // seconds
+    CARD_APPEAR_DURATION: 0.4, // seconds
+    CARD_APPEAR_OVERLAP: 0.3, // seconds
+  },
+};
+
 const MahjongCinema = () => {
   // Refs
   const videoRef = useRef(null);
@@ -21,57 +55,58 @@ const MahjongCinema = () => {
   const cardRefs = useRef([]);
 
   // State
-  const [flippedCards, setFlippedCards] = useState(Array(5).fill(false));
+  const [flippedCards, setFlippedCards] = useState(Array(CONFIG.CARD_COUNT).fill(false));
   const [cardFrontImages, setCardFrontImages] = useState([]);
   const [videoEnded, setVideoEnded] = useState(false);
   const [canInteract, setCanInteract] = useState(false);
-  const [isShuffling, setIsShuffling] = useState(false); // 섞는 중 상태 추가
+  const [isShuffling, setIsShuffling] = useState(false);
 
   // 앞면 이미지 배열
   const frontImages = useRef([front1Img, front2Img, front3Img, front4Img]).current;
 
   // 카드 섞기 함수 (명확한 3단계 순서)
   const shuffleCards = () => {
-    if (isShuffling) return; // 이미 섞는 중이면 중복 실행 방지
+    if (isShuffling) return;
     
     setIsShuffling(true);
-    console.log("🔄 SHUFFLE 시작");
     
-    // === 1단계: 모든 패가 뒷면인지 확인 ===
     const hasFlippedCards = flippedCards.some(card => card === true);
-    console.log("1단계: 뒷면 확인 -", hasFlippedCards ? "앞면 있음" : "모두 뒷면");
     
     if (hasFlippedCards) {
-      // === 2단계: 앞면 카드가 있다면 뒷면으로 뒤집기 ===
+<<<<<<< HEAD:src/pages/Roulette/MahjongCinema.jsx
       console.log("2단계: 모든 카드를 뒷면으로 뒤집는 중...");
-      setFlippedCards(Array(5).fill(false));
+      setFlippedCards(Array(CONFIG.CARD_COUNT).fill(false));
       
-      // 뒤집는 애니메이션 완료 대기 (0.6초 애니메이션 + 0.2초 여유)
+      const flipWaitTime = CONFIG.CARD_FLIP_DURATION + CONFIG.CARD_FLIP_BUFFER;
       setTimeout(() => {
         console.log("2단계 완료: 모든 카드가 뒷면이 됨");
-        
-        // === 3단계: 패의 앞면을 랜덤으로 재설정 ===
         console.log("3단계: 패의 앞면 랜덤 재설정 중...");
+        
+        const randomFronts = Array(CONFIG.CARD_COUNT)
+=======
+      setFlippedCards(Array(5).fill(false));
+      
+      setTimeout(() => {
         const randomFronts = Array(5)
+>>>>>>> 79c27df620860ee5fd2a2150fd1842c166731c43:src/pages/Mahjong/MahjongCinema.jsx
           .fill(null)
           .map(() => frontImages[Math.floor(Math.random() * frontImages.length)]);
         setCardFrontImages(randomFronts);
-        console.log("3단계 완료: 새로운 패 할당됨");
-        console.log("✅ SHUFFLE 완료");
         
         setIsShuffling(false);
-      }, 800);
+      }, flipWaitTime);
     } else {
-      // 이미 모든 카드가 뒷면이면 2단계 스킵하고 바로 3단계
+<<<<<<< HEAD:src/pages/Roulette/MahjongCinema.jsx
       console.log("2단계 스킵: 이미 모두 뒷면");
       console.log("3단계: 패의 앞면 랜덤 재설정 중...");
       
+      const randomFronts = Array(CONFIG.CARD_COUNT)
+=======
       const randomFronts = Array(5)
+>>>>>>> 79c27df620860ee5fd2a2150fd1842c166731c43:src/pages/Mahjong/MahjongCinema.jsx
         .fill(null)
         .map(() => frontImages[Math.floor(Math.random() * frontImages.length)]);
       setCardFrontImages(randomFronts);
-      console.log("3단계 완료: 새로운 패 할당됨");
-      console.log("✅ SHUFFLE 완료");
       
       setIsShuffling(false);
     }
@@ -92,26 +127,22 @@ const MahjongCinema = () => {
 
         if (duration) {
           const progress = currentTime / duration;
+          const { INTRO_END, MIDDLE_END } = CONFIG.VIDEO_SPEED_BREAKPOINTS;
+          const { INTRO, MIDDLE, OUTRO } = CONFIG.VIDEO_SPEED;
 
-          // 초반 (0~30%): 1.5배속
-          if (progress < 0.3) {
-            video.playbackRate = 1.5;
-          }
-          // 중간 (30~70%): 1.2배속
-          else if (progress >= 0.3 && progress < 0.7) {
-            video.playbackRate = 1.2;
-          }
-          // 마무리 (70~100%): 1.5배속
-          else {
-            video.playbackRate = 1.5;
+          if (progress < INTRO_END) {
+            video.playbackRate = INTRO;
+          } else if (progress >= INTRO_END && progress < MIDDLE_END) {
+            video.playbackRate = MIDDLE;
+          } else {
+            video.playbackRate = OUTRO;
           }
         }
       }
     };
 
     if (video) {
-      // 초기 속도 1.5배
-      video.playbackRate = 1.5;
+      video.playbackRate = CONFIG.VIDEO_SPEED.INTRO;
       video.addEventListener("timeupdate", handleTimeUpdate);
     }
 
@@ -119,7 +150,7 @@ const MahjongCinema = () => {
     const ctx = gsap.context(() => {
       // === 초기 상태 설정 ===
       gsap.set(tableBgRef.current, {
-        scale: 1.3,
+        scale: CONFIG.ANIMATION.TABLE_SCALE_INITIAL,
         opacity: 0,
       });
 
@@ -142,13 +173,12 @@ const MahjongCinema = () => {
 
     // === 비디오 종료 이벤트 핸들러 ===
     const handleVideoEnd = () => {
-      console.log("Video ended - transitioning to table");
       setVideoEnded(true);
 
       // 비디오 최적화: 완전히 정지 및 언로드
       if (video) {
         video.pause();
-        video.src = ""; // 메모리 해제
+        video.src = "";
         video.load();
       }
 
@@ -157,9 +187,9 @@ const MahjongCinema = () => {
 
       // 1. 테이블 이미지 등장 (줌인하며 페이드인)
       tl.to(tableBgRef.current, {
-        scale: 1.0,
+        scale: CONFIG.ANIMATION.TABLE_SCALE_FINAL,
         opacity: 1,
-        duration: 2,
+        duration: CONFIG.ANIMATION.TABLE_TRANSITION_DURATION,
         ease: "power2.out",
       });
 
@@ -169,7 +199,7 @@ const MahjongCinema = () => {
         {
           opacity: 1,
           y: 0,
-          duration: 1,
+          duration: CONFIG.ANIMATION.CARD_CONTAINER_TRANSITION_DURATION,
           ease: "power2.out",
         },
         "-=0.5"
@@ -183,10 +213,10 @@ const MahjongCinema = () => {
             {
               opacity: 1,
               y: 0,
-              duration: 0.4,
+              duration: CONFIG.ANIMATION.CARD_APPEAR_DURATION,
               ease: "back.out(1.5)",
             },
-            `-=${i === 0 ? 0 : 0.3}` // 0.3초씩 겹치며 등장
+            `-=${i === 0 ? 0 : CONFIG.ANIMATION.CARD_APPEAR_OVERLAP}`
           );
         }
       });
@@ -199,15 +229,6 @@ const MahjongCinema = () => {
 
     if (video) {
       video.addEventListener("ended", handleVideoEnd);
-      
-      // 비디오 로드 확인
-      video.addEventListener("loadeddata", () => {
-        console.log("Video loaded successfully");
-      });
-
-      video.addEventListener("error", (e) => {
-        console.error("Video error:", e);
-      });
     }
 
     // Cleanup
@@ -222,11 +243,8 @@ const MahjongCinema = () => {
 
   // === 카드 뒤집기 핸들러 (토글 방식) ===
   const handleFlipCard = (index) => {
-    if (!canInteract || isShuffling) return; // 섞는 중에는 클릭 불가
+    if (!canInteract || isShuffling) return;
 
-    console.log(`Toggling card ${index}`);
-
-    // 상태 토글 (뒤집기/되돌리기)
     const newFlippedCards = [...flippedCards];
     newFlippedCards[index] = !newFlippedCards[index];
     setFlippedCards(newFlippedCards);
@@ -293,7 +311,7 @@ const MahjongCinema = () => {
         className="absolute inset-0 flex items-center justify-center z-30 px-8"
       >
         <div className="flex gap-6 justify-center">
-          {Array(5)
+          {Array(CONFIG.CARD_COUNT)
             .fill(null)
             .map((_, index) => (
               <div
@@ -313,7 +331,7 @@ const MahjongCinema = () => {
                   style={{
                     transformStyle: "preserve-3d",
                     transform: flippedCards[index] ? "rotateY(180deg)" : "rotateY(0deg)",
-                    transition: "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+                    transition: `transform ${CONFIG.CARD_FLIP_DURATION}ms cubic-bezier(0.4, 0, 0.2, 1)`,
                   }}
                 >
                   {/* 뒷면 (초기 상태) */}
@@ -365,6 +383,7 @@ const MahjongCinema = () => {
       {/* === LAYER 5: 좌측 하단 - SKIP 버튼 (인트로 중) === */}
       {!videoEnded && (
         <div className="absolute bottom-12 left-12 z-50">
+<<<<<<< HEAD:src/pages/Roulette/MahjongCinema.jsx
           <motion.button
             onPointerDown={handleSkipVideo}
             className="group relative touch-none"
@@ -381,14 +400,29 @@ const MahjongCinema = () => {
               SKIP INTRO
             </span>
           </motion.button>
+=======
+          <IconButton
+            onPress={handleSkipVideo}
+            variant="yellow"
+            icon={<span className="text-white text-2xl font-bold">⏭</span>}
+            label="SKIP INTRO"
+            labelPosition="right"
+            animation={{
+              initial: { opacity: 0, x: -20 },
+              animate: { opacity: 1, x: 0 },
+              transition: { delay: 0.5 },
+            }}
+          />
+>>>>>>> a525dd3dc406ddda2f5a3c3b0ab0c4b063b14d7d:src/pages/Mahjong/MahjongCinema.jsx
         </div>
       )}
 
       {/* === LAYER 6: 우측 하단 - SHUFFLE & EXIT 버튼들 === */}
       <div className="absolute bottom-12 right-12 z-50 flex flex-col gap-4">
         
-        {/* SHUFFLE 버튼 (카드 인터랙션 활성화 후) */}
+        {/* SHUFFLE 버튼 */}
         {canInteract && (
+<<<<<<< HEAD:src/pages/Roulette/MahjongCinema.jsx
           <motion.button
             onPointerDown={shuffleCards}
             disabled={isShuffling}
@@ -401,6 +435,14 @@ const MahjongCinema = () => {
           >
             <div className={`w-16 h-16 bg-gradient-to-br from-emerald-600 to-emerald-900 rounded-lg border-2 border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.5)] group-hover:shadow-[0_0_30px_rgba(16,185,129,0.8)] flex items-center justify-center transition-all duration-300 ${isShuffling ? 'opacity-50 cursor-not-allowed' : ''}`}>
               {isShuffling ? (
+=======
+          <IconButton
+            onPress={shuffleCards}
+            disabled={isShuffling}
+            variant="green"
+            icon={
+              isShuffling ? (
+>>>>>>> a525dd3dc406ddda2f5a3c3b0ab0c4b063b14d7d:src/pages/Mahjong/MahjongCinema.jsx
                 <span className="text-white text-2xl animate-spin">🔄</span>
               ) : (
                 <img 
@@ -408,16 +450,22 @@ const MahjongCinema = () => {
                   alt="Shuffle" 
                   className="w-10 h-10 object-contain"
                 />
-              )}
-            </div>
-            <span className="absolute -left-2 top-1/2 -translate-y-1/2 -translate-x-full text-[10px] text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap tracking-wider pr-2">
-              {isShuffling ? 'SHUFFLING...' : 'SHUFFLE'}
-            </span>
-          </motion.button>
+              )
+            }
+            label={isShuffling ? 'SHUFFLING...' : 'SHUFFLE'}
+            labelPosition="left"
+            animation={{
+              initial: { opacity: 0, x: 20 },
+              animate: { opacity: 1, x: 0 },
+              transition: { delay: 1 },
+            }}
+          />
         )}
 
+
         {/* EXIT 버튼 (항상 표시) */}
-        <Link to="/" className="group relative">
+        <Link to="/?skipIntro=true" className="group relative">
+b8f3e0a02c093bbbf7e747b41970450ad98b789b:src/pages/Mahjong/MahjongCinema.jsx
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -425,16 +473,19 @@ const MahjongCinema = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: videoEnded ? 1.5 : 0.5 }}
           >
-            <div className="w-16 h-16 bg-gradient-to-br from-red-600 to-red-900 rounded-lg border-2 border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.5)] group-hover:shadow-[0_0_30px_rgba(239,68,68,0.8)] flex items-center justify-center transition-all duration-300">
-              <img 
-                src={front1Img} 
-                alt="Exit" 
-                className="w-10 h-10 object-contain"
-              />
-            </div>
-            <span className="absolute -left-2 top-1/2 -translate-y-1/2 -translate-x-full text-[10px] text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap tracking-wider pr-2">
-              EXIT
-            </span>
+            <IconButton
+              onPress={() => {}}
+              variant="red"
+              icon={
+                <img 
+                  src={front1Img} 
+                  alt="Exit" 
+                  className="w-10 h-10 object-contain"
+                />
+              }
+              label="EXIT"
+              labelPosition="left"
+            />
           </motion.div>
         </Link>
 
