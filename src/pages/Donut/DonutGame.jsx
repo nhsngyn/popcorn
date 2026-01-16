@@ -1,42 +1,39 @@
-// src/pages/Donut/DonutGame.jsx
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// ============================================
-// 상수 정의 (Magic Numbers 제거)
-// ============================================
+import brownDonut from "../../assets/donut/brown.png";
+import mintDonut from "../../assets/donut/mint.png";
+import pinkDonut from "../../assets/donut/pink.png";
+import redDonut from "../../assets/donut/red.png";
+import yellowDonut from "../../assets/donut/yellow.png";
+
+const DONUT_IMAGES = [brownDonut, mintDonut, pinkDonut, redDonut, yellowDonut];
+
 const CONFIG = {
-  // 도넛 색상
-  COLORS: ["#ff9ff3", "#feca57", "#ff6b6b", "#48dbfb", "#1dd1a1"],
-  
-  // 게임 설정
   GAME: {
-    TARGET_STACK: 5,           // 목표 도넛 개수
-    INITIAL_SPEED: 3,          // 초기 속도
-    SPEED_INCREMENT: 1.0,      // 레벨업 시 속도 증가량
-    BOUNDARY_X: 150,           // 좌우 이동 범위 (px)
+    TARGET_STACK: 10,
+    INITIAL_SPEED: 4,
+    SPEED_INCREMENT: 1.0,      
+    BOUNDARY_X: 350, 
+    TOLERANCE: 140, 
   },
-  
-  // 애니메이션 설정
   ANIMATION: {
-    DONUT_DROP_Y: -300,        // 도넛 떨어지는 초기 위치
-    DONUT_STACK_GAP: 35,       // 쌓인 도넛 간격 (px)
+    DONUT_DROP_Y: -600,
+    DONUT_STACK_GAP: 50,
     SPRING_STIFFNESS: 400,
     SPRING_DAMPING: 20,
   },
-  
-  // UI 크기
   UI: {
-    DONUT_WIDTH: 128,          // w-32 = 128px
-    DONUT_HEIGHT: 48,          // h-12 = 48px
-    CONTAINER_HEIGHT: 400,     // 게임 영역 높이
+    DONUT_WIDTH: 280,
+    CONTAINER_HEIGHT: 750,
   },
 };
 
 const DonutGame = ({ onScoreUpdate, onGameClear }) => {
-  const [stack, setStack] = useState([]); 
+  const [stack, setStack] = useState([{ x: 0, img: DONUT_IMAGES[0] }]); 
   const [renderX, setRenderX] = useState(0); 
   const [gameStatus, setGameStatus] = useState("playing"); 
+  const [currentDonutImg, setCurrentDonutImg] = useState(DONUT_IMAGES[1]); 
 
   const xRef = useRef(0);
   const directionRef = useRef(1);
@@ -44,7 +41,6 @@ const DonutGame = ({ onScoreUpdate, onGameClear }) => {
   const animationRef = useRef();
   const isPlayingRef = useRef(true);
 
-  // 게임 루프
   const gameLoop = () => {
     if (!isPlayingRef.current) return;
 
@@ -70,19 +66,28 @@ const DonutGame = ({ onScoreUpdate, onGameClear }) => {
     return () => cancelAnimationFrame(animationRef.current);
   }, [gameStatus]);
 
-  // 도넛 떨어뜨리기
   const handleDrop = () => {
     if (gameStatus !== "playing") return;
 
     const currentDropX = xRef.current;
-    
-    const newDonut = { 
-      x: currentDropX, 
-      color: CONFIG.COLORS[stack.length % CONFIG.COLORS.length] 
-    };
+    const previousDonut = stack[stack.length - 1]; 
+    const diff = Math.abs(currentDropX - previousDonut.x);
+
+    // [실패 조건]
+    if (diff > CONFIG.GAME.TOLERANCE) {
+        isPlayingRef.current = false;
+        setGameStatus("fail");
+        cancelAnimationFrame(animationRef.current);
+        return;
+    }
+
+    // [성공]
+    const newDonut = { x: currentDropX, img: currentDonutImg };
     const newStack = [...stack, newDonut];
     setStack(newStack);
     onScoreUpdate(newStack.length);
+
+    setCurrentDonutImg(DONUT_IMAGES[Math.floor(Math.random() * DONUT_IMAGES.length)]);
 
     if (newStack.length >= CONFIG.GAME.TARGET_STACK) {
       isPlayingRef.current = false;
@@ -102,37 +107,27 @@ const DonutGame = ({ onScoreUpdate, onGameClear }) => {
     >
       
       {/* 1. 쌓인 도넛들 */}
-      <div className="relative w-full h-full flex flex-col-reverse items-center mb-10">
+      <div className="relative w-full h-full flex flex-col-reverse items-center mb-4">
         <AnimatePresence>
           {stack.map((donut, index) => (
             <motion.div
               key={index}
-              initial={{ y: CONFIG.ANIMATION.DONUT_DROP_Y, opacity: 0 }} 
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ 
-                type: "spring", 
-                stiffness: CONFIG.ANIMATION.SPRING_STIFFNESS, 
-                damping: CONFIG.ANIMATION.SPRING_DAMPING 
-              }}
-              className="absolute"
+              // ✅ [수정] style transform 대신 animate 속성에 x: "-50%" 직접 지정
+              initial={index === 0 
+                ? { y: 0, opacity: 1, x: "-50%" } 
+                : { y: CONFIG.ANIMATION.DONUT_DROP_Y, opacity: 0, rotate: -30, x: "-50%" }
+              } 
+              animate={{ y: 0, opacity: 1, rotate: 0, x: "-50%" }}
+              transition={{ type: "spring", stiffness: CONFIG.ANIMATION.SPRING_STIFFNESS, damping: CONFIG.ANIMATION.SPRING_DAMPING }}
+              className="absolute drop-shadow-2xl"
               style={{
                 bottom: index * CONFIG.ANIMATION.DONUT_STACK_GAP, 
                 left: `calc(50% + ${donut.x}px)`, 
                 zIndex: index,
+                // transform: "translateX(-50%)"  <-- 이거 제거됨 (충돌 원인)
               }}
             >
-              <div 
-                className="rounded-[50%] border-4 border-black shadow-[0_5px_0_rgba(0,0,0,0.2)]"
-                style={{ 
-                  backgroundColor: donut.color, 
-                  transform: "translateX(-50%)",
-                  width: `${CONFIG.UI.DONUT_WIDTH}px`,
-                  height: `${CONFIG.UI.DONUT_HEIGHT}px`,
-                }}
-              >
-                <div className="absolute top-1 left-1/2 -translate-x-1/2 w-12 h-6 bg-black/10 rounded-[50%]" />
-                <div className="absolute top-0 right-4 w-2 h-2 bg-white rounded-full opacity-50" />
-              </div>
+              <img src={donut.img} alt="donut" className="select-none pointer-events-none max-w-none" style={{ width: `${CONFIG.UI.DONUT_WIDTH}px` }} />
             </motion.div>
           ))}
         </AnimatePresence>
@@ -140,36 +135,49 @@ const DonutGame = ({ onScoreUpdate, onGameClear }) => {
 
       {/* 2. 현재 움직이는 도넛 */}
       {gameStatus === "playing" && (
-        <div 
-          className="absolute top-10 will-change-transform"
+        <motion.div 
+          // ✅ [수정] 여기도 x: "-50%" 추가하여 중앙 정렬 고정
+          initial={{ scale: 0, opacity: 0, x: "-50%" }}
+          animate={{ scale: 1, opacity: 1, x: "-50%" }}
+          transition={{ delay: 1.5, type: "spring" }}
+          className="absolute top-0 will-change-transform z-50"
           style={{ 
             left: `calc(50% + ${renderX}px)`,
-            transform: "translateX(-50%)"
           }}
         >
-           <div 
-              className="rounded-[50%] border-4 border-black shadow-xl"
-              style={{ 
-                backgroundColor: CONFIG.COLORS[stack.length % CONFIG.COLORS.length],
-                width: `${CONFIG.UI.DONUT_WIDTH}px`,
-                height: `${CONFIG.UI.DONUT_HEIGHT}px`,
-              }}
-            >
-              <div className="absolute top-1 left-1/2 -translate-x-1/2 w-12 h-6 bg-black/10 rounded-[50%]" />
-           </div>
-           <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-2xl animate-bounce">👇</div>
-        </div>
+           <img src={currentDonutImg} alt="current donut" className="drop-shadow-xl max-w-none" style={{ width: `${CONFIG.UI.DONUT_WIDTH}px` }} />
+           <div className="absolute -top-10 left-1/2 -translate-x-1/2 text-4xl animate-bounce filter drop-shadow-md">👇</div>
+        </motion.div>
       )}
 
       {/* 3. 성공 메시지 */}
       {gameStatus === "success" && (
         <motion.div 
-          initial={{ scale: 0 }} animate={{ scale: 1 }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none"
+          // ✅ [수정] 성공 메시지도 확실하게 x: "-50%"
+          initial={{ scale: 0, rotate: -180, x: "-50%", y: "-50%" }} 
+          animate={{ scale: 1, rotate: -12, x: "-50%", y: "-50%" }}
+          className="absolute top-1/2 left-1/2 z-[100] pointer-events-none"
         >
-          <h2 className="text-6xl font-black text-yellow-300 drop-shadow-[4px_4px_0_#000] -rotate-12 whitespace-nowrap">
+          <h2 className="text-8xl font-black text-yellow-300 whitespace-nowrap" style={{ textShadow: "6px 6px 0px #000, -3px -3px 0 #ec4899", fontFamily: "Impact, sans-serif" }}>
             DELICIOUS!
           </h2>
+        </motion.div>
+      )}
+
+      {/* 4. 실패 메시지 */}
+      {gameStatus === "fail" && (
+        <motion.div 
+          // ✅ [수정] 실패 메시지도 x: "-50%" (이전엔 translate-x-1/2 클래스 사용했으나 Motion 충돌 방지 위해 속성으로 변경)
+          initial={{ scale: 0, y: -50, x: "-50%" }} 
+          animate={{ scale: 1, y: 0, x: "-50%" }}
+          className="absolute top-1/3 left-1/2 z-[100] pointer-events-none text-center"
+        >
+          <h2 className="text-6xl font-black text-red-500 whitespace-nowrap mb-2" style={{ textShadow: "4px 4px 0px #000", fontFamily: "Impact, sans-serif" }}>
+            OOPS!
+          </h2>
+          <p className="text-lg font-bold text-white bg-black px-4 py-2 rounded-full inline-block animate-bounce shadow-lg">
+             Try Again
+          </p>
         </motion.div>
       )}
 
