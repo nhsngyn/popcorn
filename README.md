@@ -1,4 +1,4 @@
-# 🎬 POPCORN: Web Interaction Cinema
+#  POPCORN: Web Interaction Cinema
 
 ![Project Status](https://img.shields.io/badge/Status-Completed-success) ![Version](https://img.shields.io/badge/Version-1.0.0-blue) ![License](https://img.shields.io/badge/License-MIT-green)
 
@@ -6,7 +6,7 @@
 
 ---
 
-## 📖 프로젝트 소개
+##  프로젝트 소개
 
 **POPCORN**은 영화 속 상징적인 미장센(Mise-en-scène)을 웹 기술로 재해석한 실험적인 인터랙티브 웹 사이트입니다.
 
@@ -17,7 +17,7 @@ https://popcornlab.vercel.app/
 
 ---
 
-## 🛠 기술 스택 (Tech Stack)
+##  기술 스택 (Tech Stack)
 
 | 분류 | 기술 | 활용 목적 |
 |:---:|:---|:---|
@@ -29,7 +29,7 @@ https://popcornlab.vercel.app/
 
 ---
 
-## 🎭 주요 기능 및 인터랙션 (Features)
+##  주요 기능 및 인터랙션 (Features)
 
 ### 1. Night in HK (홍콩 누아르)
 > *"흔들리는 네온사인, 테이블 위 마작패의 긴장감"*
@@ -61,7 +61,7 @@ https://popcornlab.vercel.app/
 
 ---
 
-## ⚡️ 기술적 도전과 해결 (Troubleshooting)
+##  기술적 도전과 해결 (Troubleshooting)
 
 ### 1. Canvas 성능 최적화 (Scratch)
 * **문제**: `mousemove` 이벤트마다 전체 픽셀을 검사(`getImageData`)하여 진행률을 체크하니 프레임 드랍 발생.
@@ -77,7 +77,7 @@ https://popcornlab.vercel.app/
 
 ---
 
-## 📂 폴더 구조 (Directory Structure)
+##  폴더 구조 (Directory Structure)
 
 ```bash
 src/
@@ -94,7 +94,7 @@ src/
 
 ---
 
-## 🚀 실행 방법 (Getting Started)
+##  실행 방법 (Getting Started)
 
 ```bash
 # 1. 저장소 클론
@@ -114,7 +114,7 @@ npm run preview
 
 ---
 
-## 📝 License
+##  License
 
 This project is licensed under the [MIT](https://www.google.com/search?q=LICENSE) License.
 
