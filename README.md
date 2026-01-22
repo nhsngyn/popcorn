@@ -1,96 +1,70 @@
-#  POPCORN: Web Interaction Cinema
+# POPCORN: Web Interaction Cinema
 
-![Project Status](https://img.shields.io/badge/Status-Completed-success) ![Version](https://img.shields.io/badge/Version-1.0.0-blue) ![License](https://img.shields.io/badge/License-MIT-green)
+![Status](https://img.shields.io/badge/Status-Completed-success)
+![Platform](https://img.shields.io/badge/Platform-Desktop_Optimized-blueviolet)
+![Tech](https://img.shields.io/badge/No_WebGL-Canvas_API_Only-orange)
 
-> **"웹에서 경험하는 영화적 미장센"** > 3D 라이브러리 없이, 오직 2D 인터랙션 기술만으로 구현한 시네마틱 웹 전시 프로젝트
-
----
-
-##  프로젝트 소개
-
-**POPCORN**은 영화 속 상징적인 미장센(Mise-en-scène)을 웹 기술로 재해석한 실험적인 인터랙티브 웹 사이트입니다.
-
-홍콩 누아르의 **시각적 긴장감**, 다크 판타지의 **기묘한 공포**, 레트로 팝아트의 **경쾌한 리듬감**을 각각 다른 기술적 접근 방식으로 구현했습니다. Three.js 같은 무거운 3D 라이브러리에 의존하지 않고, **React 19와 GSAP, Canvas API**를 극한으로 활용하여 가볍지만 깊이 있는 공간감을 만들어내는 데 집중했습니다.
-
-### 🔗 배포 주소
-https://popcornlab.vercel.app/
+> **"웹에서 경험하는 영화적 미장센"**
+> 무거운 3D 라이브러리 없이, 오직 2D 기술(Canvas & React)로 구현한 데스크톱 최적화 인터랙티브 전시
 
 ---
 
-##  기술 스택 (Tech Stack)
+## 📽️ 프로젝트 소개
+
+**POPCORN**은 영화 속 상징적인 미장센(Mise-en-scène)을 웹 기술로 재해석한 인터랙티브 웹 사이트입니다.
+
+일반적으로 화려한 시각 효과를 위해 Three.js를 사용하지만, 이 프로젝트는 **"브라우저 네이티브 기술의 깊이 있는 활용"**을 목표로 삼았습니다. 마우스 커서의 움직임에 반응하는 섬세한 물리 효과와 픽셀 조작을 통해, **데스크톱 환경에서 몰입감 높은 시네마틱 경험**을 제공하는 데 집중했습니다.
+
+### 🔗 배포 주소 (Live Demo)
+[https://popcornlab.vercel.app/](https://popcornlab.vercel.app/)
+*(Desktop Chrome/Whale 환경에 최적화되어 있습니다)*
+
+---
+
+## 🛠️ 기술 스택 (Tech Stack)
 
 | 분류 | 기술 | 활용 목적 |
 |:---:|:---|:---|
-| **Core** | ![React](https://img.shields.io/badge/React_19-20232A?style=flat&logo=react&logoColor=61DAFB) ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white) | 최신 React 기능 활용 및 빠른 빌드 환경 구축 |
-| **Animation** | ![GSAP](https://img.shields.io/badge/GSAP_3-88CE02?style=flat&logo=greensock&logoColor=white) ![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=flat&logo=framer&logoColor=white) | 복잡한 시퀀스 제어(GSAP) 및 선언적 UI 애니메이션(Framer) |
-| **Graphic** | ![Canvas API](https://img.shields.io/badge/Canvas_API-E34F26?style=flat&logo=html5&logoColor=white) | 픽셀 단위 조작 및 스크래치 효과 구현 |
-| **Styling** | ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwindcss&logoColor=white) | 반응형 레이아웃 및 빠른 스타일링 |
-| **Deploy** | ![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat&logo=vercel&logoColor=white) | CI/CD 및 호스팅 (예정) |
+| **Core** | React 19, Vite | 최신 React 기능 활용 및 빠른 빌드 환경 구축 |
+| **Animation** | GSAP 3, Framer Motion | 복잡한 시퀀스 제어 및 선언적 UI 애니메이션 |
+| **Graphic** | **Canvas API** | 픽셀 단위 조작(Pixel Manipulation) 및 물리 효과 구현 |
+| **Styling** | Tailwind CSS | 반응형 레이아웃 및 빠른 스타일링 |
+| **Deploy** | Vercel | CI/CD 및 정적 호스팅 |
 
 ---
 
-##  주요 기능 및 인터랙션 (Features)
+## ⚡️ 핵심 기술적 도전 (Technical Challenges)
 
-### 1. Night in HK (홍콩 누아르)
-> *"흔들리는 네온사인, 테이블 위 마작패의 긴장감"*
+### 1. Canvas Pixel Manipulation 최적화
+* **Challenge**: 스크래치 효과 구현 시, 긁어낸 면적(%)을 계산하기 위해 `getImageData`로 약 200만 개의 픽셀(FHD 기준)을 매 프레임 순회하여 심각한 성능 저하 발생.
+* **Solution**:
+    * **Stride Sampling 알고리즘**: 전체 픽셀을 검사하는 대신 `stride += 64` (16픽셀 간격) 로직을 적용. 샘플링 대상을 **전체의 1/16로 축소하여 연산 비용을 약 94% 절감**하면서도 오차 범위 내의 정확도 확보.
+    * **Logic Separation**: 시각적 드로잉(Render)은 `mousemove`에서, 고비용 계산(Calculate)은 `mouseup` 시점에만 수행하도록 스레드 점유 분리.
 
-* **Concept**: 왕가위 감독 영화 특유의 스텝 프린팅 기법과 몽환적인 색감 재현
-* **Tech Highlights**:
-    * `<video>` 태그의 `playbackRate`를 동적으로 조절하여 시간의 왜곡 표현
-    * **GSAP Context**를 활용한 마작패 셔플 및 3D Flip 애니메이션
-    * 상태 관리를 통한 인터랙션 단계 제어 (Intro → Shuffle → Interaction)
+### 2. Video & DOM Seamless Transition
+* **Challenge**: 인트로 비디오 종료 후 인터랙티브 DOM으로 전환되는 순간, 미세한 로딩 텀과 깜빡임(Flicker)으로 인해 몰입감이 깨지는 문제.
+* **Solution**:
+    * **Frame Synchronization**: 비디오의 마지막 프레임과 완벽히 동일한 고해상도 이미지를 DOM 레이어 최상단에 미리 로드.
+    * **GSAP Timeline**: 영상 종료(`onEnded`) 트리거와 동시에 DOM 레이어의 `opacity`와 `scale`을 정교하게 교차(Cross-fade)시켜, 사용자가 전환 시점을 인지할 수 없는 **Seamless Transition** 달성.
 
-### 2. Secret Door (다크 판타지)
-> *"문 너머의 진실을 긁어내라, Beware the witch's lies"*
-
-* **Concept**: 영화 '코렐라인'의 기괴하고 신비로운 '단추 구멍' 너머의 세계
-* **Tech Highlights**:
-    * **HTML5 Canvas API**의 `globalCompositeOperation = 'destination-out'`을 활용한 리얼타임 스크래치 구현
-    * 픽셀 데이터(`getImageData`) 샘플링 최적화로 긁어낸 면적(%) 실시간 계산
-    * 마우스/터치 좌표 보정을 통한 **커스텀 커서(바늘)** 트래킹 및 베지어 곡선 드로잉
-    * Framer Motion을 활용한 핸드 헬드(Hand-held) 느낌의 패럴랙스 줌인 연출
-
-### 3. Pop Diner (레트로 팝아트)
-> *"80년대 다이너의 경쾌한 리듬, 쌓아올리는 달콤함"*
-
-* **Concept**: 앤디 워홀 스타일의 팝아트 컬러와 미국 레트로 다이너 감성
-* **Tech Highlights**:
-    * **GSAP Physics** 느낌의 `squash & stretch` (찌그러짐) 애니메이션으로 타격감 구현
-    * 화면 크기에 반응하는 좌표 계산 로직으로 정확한 충돌 판정 및 쌓기(Stacking) 구현
-    * 오차 범위 허용(Tolerance) 알고리즘을 통한 게임 난이도 밸런싱
+### 3. Desktop-First Interaction Design
+* **Strategy**: 작은 모바일 화면보다는 넓은 데스크톱 화면에서의 몰입감을 우선순위로 두는 **'선택과 집중'** 전략 채택.
+* **Implementation**: 마우스 좌표(`clientX/Y`)를 기반으로 실시간 반응하는 커스텀 커서와 호버 인터랙션을 구현하여, 단순 웹사이트가 아닌 **'PC 게임' 같은 조작감**을 부여.
 
 ---
 
-##  기술적 도전과 해결 (Troubleshooting)
-
-### 1. Canvas 성능 최적화 (Scratch)
-* **문제**: `mousemove` 이벤트마다 전체 픽셀을 검사(`getImageData`)하여 진행률을 체크하니 프레임 드랍 발생.
-* **해결**: 드로잉 중에는 캔버스에 그리기만 수행하고, **`mouseup` (드래그 종료) 시점에만 픽셀 연산을 수행**하도록 로직 분리. 픽셀 검사 시에도 전체가 아닌 `stride` 기법(64픽셀 건너뛰기)을 적용하여 연산량을 획기적으로 감소시킴.
-
-### 2. 동영상과 DOM의 이질감 제거 (Mahjong)
-* **문제**: 인트로 영상이 끝나고 인터랙티브 DOM 요소로 전환될 때 깜빡임이나 이질감 발생.
-* **해결**: 영상 종료(`onEnded`) 시점에 맞춰 **GSAP Timeline**을 실행, 배경 이미지를 영상의 마지막 프레임과 정확히 일치시키고 `opacity`와 `scale`을 미세하게 교차(Cross-fade)시켜 끊김 없는 사용자 경험 제공.
-
-### 3. 모바일 터치 대응 (Common)
-* **문제**: 모바일 환경에서 스크래치나 드래그 시 브라우저 스크롤이 같이 발생하거나 터치 딜레이 발생.
-* **해결**: CSS `touch-action: none` 적용 및 React의 `PointerEvent`를 활용하여 마우스와 터치 이벤트를 통합 처리.
-
----
-
-##  폴더 구조 (Directory Structure)
+## 📂 폴더 구조 (Directory Structure)
 
 ```bash
 src/
 ├── pages/
 │   ├── Lobby/          # 메인 게이트 (3D 카드형 메뉴)
 │   ├── Mahjong/        # 마작 인터랙션 (Video + GSAP)
-│   ├── Scratch/        # 스크래치 인터랙션 (Canvas API)
+│   ├── Scratch/        # 스크래치 인터랙션 (Canvas API + Optimization)
 │   └── Donut/          # 도넛 게임 (Physics Logic)
 ├── components/         # 재사용 가능한 UI 컴포넌트
 ├── assets/             # 최적화된 이미지 및 비디오 리소스
 └── styles/             # Tailwind 설정 및 글로벌 스타일
-
-```
 
 ---
 
